@@ -1,7 +1,6 @@
 package org.engine.utils;
 
 import java.util.Comparator;
-import java.util.Iterator;
 
 import com.badlogic.gdx.utils.ObjectMap.Entry;
 import com.badlogic.gdx.utils.Sort;
@@ -145,51 +144,7 @@ public class ArrayMap<K, V> {
 
 	public Iterable<Entry<K, V>> entries() {
 
-		return new WorkaroundIterable(this);
-	}
-	
-	class WorkaroundIterable implements Iterable<Entry<K, V>>, Iterator<Entry<K, V>> {
-
-		int index = 0;
-		ArrayMap<K, V> map;
-		
-		public WorkaroundIterable(ArrayMap<K, V> map) {
-
-			this.map = map;
-		}
-		
-		@Override
-		public boolean hasNext() {
-
-			if (index < map.getSize()) {
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public Entry<K, V> next() {
-			
-			Entry<K, V> nextEntry = new Entry<K, V>();
-			nextEntry.key = map.getKeyAt(index);
-			nextEntry.value = map.getValueAt(index);
-			index ++;
-			return nextEntry;
-		}
-
-		@Override
-		public void remove() {
-			
-			if (index < map.getSize()) {
-				map.removeIndex(index);
-			}
-		}
-
-		@Override
-		public Iterator<Entry<K, V>> iterator() {
-
-			return this;
-		}
+		return m.entries();
 	}
 
 	public K getKeyAt(final int index) {
@@ -298,13 +253,25 @@ public class ArrayMap<K, V> {
 	public void sortToKeys(final Comparator<K> c) {
 
 		final KeyComparator kc = new KeyComparator(c);
-		final Array<Entry<K, V>> a = new Array<Entry<K, V>>(entries());
+		final Array<Entry<K, V>> a = createEntryArray();
 		Sort.instance().sort(a.a, kc);
 		m.clear();
 		for (final Entry<K, V> e : a) {
 			m.put(e.key, e.value);
 		}
 		l.arrayMapChanged(this);
+	}
+
+	private Array<Entry<K, V>> createEntryArray() {
+
+		Array<Entry<K, V>> a = new Array<Entry<K,V>>();
+		for (Entry<K, V> e : m.entries()) {
+			Entry<K, V> addMe = new Entry<K, V>();
+			addMe.key = e.key;
+			addMe.value = e.value;
+			a.add(addMe);
+		}
+		return a;
 	}
 
 	public void sortToValues() {
@@ -315,7 +282,7 @@ public class ArrayMap<K, V> {
 	public void sortToValues(final Comparator<V> c) {
 
 		final ValueComparator vc = new ValueComparator(c);
-		final Array<Entry<K, V>> a = new Array<Entry<K, V>>(entries());
+		final Array<Entry<K, V>> a = createEntryArray();
 		Sort.instance().sort(a.a, vc);
 		m.clear();
 		for (final Entry<K, V> e : a) {
