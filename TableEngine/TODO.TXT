@@ -1,0 +1,58 @@
+TableEngine-Todo-Liste
+
+IDEEN:
+
+ - Netzwerkcode umbauen -> Eine Property muss über eine Reihe von IDs eindeutig identifizierbar sein, 
+  dann kann der Netzwerkcode auf die tatsächlich geänderten Propertys beschränkt werden.
+  Dann z.b. eine Liste von 10 Änderungen serverseitig abspeichern, und bei Receive-Anfrage 
+  mit letzem Timestamp nur die nachfolgenden senden.
+
+TODO:
+ - Animationen zeitabhängig (delta-Time-millis) designen
+ - Scale-Fähigkeit des BasicSynchronizable reparieren
+ - Sound-Effekte einstreuen
+ - Network zum Laufen bringen
+ - Debug Mode
+ - Mapping Mode
+ - BasicDefaultLanguage sortieren
+ - Objekt-Klassen auslagern
+ 
+ DONE:
+ - Access an die Universe class angleichen: parentUniverse statt getParentLayer().getParentUniverse()
+ - Verschiedene Auflösungen einbauen.
+ - Menü-Style anpassen 
+ - Striktere Trennung von Interactable und Synchronizable
+ - Stapelbare Properties -> ID, CONTENT, TRENNER? (Erweiterbar auf DEFAULT-CONTENT, EDITOR-CONTENT...), damit Stapelung möglich z.b. für Objekte: 
+    
+    Objekt ID: obj1 Content: Properties TAG: O
+        Property ID: X Content: 100 TAG: P
+        Property ID: Y Content: 200
+        Property ID: SubProps Content: Properties
+            Sub
+    <O>obj1<:O><P>X<:P>100<P>Y<:P>200</P><P>SubProps<:P><S>Menu1<:S>HITME<S>Menu2<:S>SHOOTME</S></P></O>
+    Stapelung als static Methode?!
+    
+ - XML kürzen: <O>ID<:O>CONTENT</O><O>ID2<:O>CONTENT2</O> kürzen auf: <O>ID<:O>CONTENT<O>ID2<:O>CONTENT2</O>
+ 
+ IMPOSSIBLE:
+  - Magnifier (Default 1x , 2x ) einbauen (nicht möglich)
+ THOUGHTS:
+  - reines XML ist zu lang, ohne xml keine stapelung von properties möglich -> vorgefertigte kurze tags?  
+Layer
+    Object1
+        X:100
+        Y:200
+        Caption:Exzellent
+        Children
+            Author:Ich
+            Version:1.0
+    Object2
+        X:400
+        Y:300
+        Caption:Nich so toll
+        Children
+            Author:Er
+            Version:3.2
+<ID>CONTENT</ID> -> Strikt befolgen!!!
+<LAYER>Layer<OBJ>Object1<PROP>X:100</PROP><PROP>...</PROP></OBJ></LAYER>
+reines und hartes XML ist zu lang!!!
