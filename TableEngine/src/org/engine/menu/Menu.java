@@ -4,7 +4,8 @@ import org.engine.Interactable;
 import org.engine.Layer;
 import org.engine.Skinnable;
 import org.engine.TableEngine;
-import org.engine.geometry.Cube;
+import org.engine.geometry.Rectangle;
+import org.engine.geometry.Vector2;
 import org.engine.gui.input.InputEvent;
 import org.engine.gui.output.Graphics;
 import org.engine.utils.Array;
@@ -15,7 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
-public class Menu extends Cube implements Interactable, Skinnable {
+public class Menu extends Rectangle implements Interactable, Skinnable {
 
 	public static class MenuStyle extends Style {
 
@@ -151,17 +152,6 @@ public class Menu extends Cube implements Interactable, Skinnable {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.engine.Synchronizable#getBounds()
-	 */
-	@Override
-	public Cube getBounds() {
-
-		return this;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see org.engine.Synchronizable#getParentLayer()
 	 */
 	@Override
@@ -232,7 +222,7 @@ public class Menu extends Cube implements Interactable, Skinnable {
 	@Override
 	public boolean input(final InputEvent e, final boolean wasCatchedAbove) {
 
-		if (getRectangle2D().contains(e.getX(), e.getY())) {
+		if (contains(e.getX(), e.getY())) {
 
 			if (e.getType() == InputEvent.TYPE_MOVE_POS) {
 
@@ -377,18 +367,6 @@ public class Menu extends Cube implements Interactable, Skinnable {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.engine.Synchronizable#setBounds(org.engine.geometry.Cube)
-	 */
-	@Override
-	public void setBounds(final Cube bounds) {
-
-		setLocation(bounds.getLocation());
-		setSize(bounds.getSize());
-	}
-
 	private void setLastIcon() {
 
 		if (item > 0) {
@@ -427,12 +405,12 @@ public class Menu extends Cube implements Interactable, Skinnable {
 			setSize(org.engine.utils.MathUtils.max(
 					style.imageSettings.getMinWidth(),
 					style.imageLeft.getMinWidth(),
-					style.imageRight.getMinWidth()), getHeight(), getDepth());
+					style.imageRight.getMinWidth()), getHeight());
 			item = 0;
 			showItem(menuItemList.get(item));
 		} else {
 			hideAll();
-			setSize(style.expand.getMinWidth(), getHeight(), getDepth());
+			setSize(style.expand.getMinWidth(), getHeight());
 		}
 	}
 
@@ -449,14 +427,14 @@ public class Menu extends Cube implements Interactable, Skinnable {
 	public void style(Skin skin) {
 
 		style = skin.get("default", MenuStyle.class);
-		setSize(style.expand.getMinWidth(), getHeight(), getDepth());
+		setSize(style.expand.getMinWidth(), getHeight());
 	}
 
 	@Override
 	public void style(Skin skin, String style) {
 
 		this.style = skin.get(style, MenuStyle.class);
-		setSize(this.style.expand.getMinWidth(), getHeight(), getDepth());
+		setSize(this.style.expand.getMinWidth(), getHeight());
 	}
 
 	@Override
@@ -464,15 +442,15 @@ public class Menu extends Cube implements Interactable, Skinnable {
 
 		if (MenuStyle.class.isAssignableFrom(style.getClass())) {
 			this.style = (MenuStyle) style;
-			setSize(this.style.expand.getMinWidth(), getHeight(), getDepth());
+			setSize(this.style.expand.getMinWidth(), getHeight());
 		}
 	}
 
 	@Override
 	public void adaptToScreenSize(int width, int height) {
 
-		setLocation(0, 0, 0);
-		setSize(getWidth(), height, 0);
+		setPosition(0, 0);
+		setSize(this.width, height);
 	}
 
 	public void addMenuItems(Array<MenuItem> menuItems) {
@@ -494,6 +472,24 @@ public class Menu extends Cube implements Interactable, Skinnable {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public boolean isColliding(Vector2 point) {
+
+		return contains(point);
+	}
+
+	@Override
+	public boolean isColliding(Rectangle r, int angle, float scale) {
+
+		return false;
+	}
+
+	@Override
+	public float depth() {
+
+		return 0;
 	}
 
 }

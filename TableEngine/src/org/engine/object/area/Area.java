@@ -3,15 +3,13 @@
  */
 package org.engine.object.area;
 
-import org.engine.Synchronizable;
-
+import org.engine.Interactable;
 import org.engine.geometry.Rectangle;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface Area.
  */
-public interface Area extends Synchronizable {
+public interface Area extends Interactable {
 
 	/**
 	 * Receive action request. Usually called when an object is dragged &
@@ -20,10 +18,10 @@ public interface Area extends Synchronizable {
 	 * @param sender
 	 *            the sender
 	 * @param rectangle
-	 *            the sender area
-	 * @return true, if successful
+	 *            the sender's bounds
+	 * @return true, if overlapping with this area.
 	 */
-	public boolean receiveActionRequest(Synchronizable sender,
+	public boolean receiveActionRequest(Interactable sender,
 			Rectangle rectangle);
 
 }

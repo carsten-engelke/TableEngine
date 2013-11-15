@@ -12,6 +12,8 @@ public class Vector3 extends com.badlogic.gdx.math.Vector3 {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private static final Vector2 v2D = new Vector2();
 
 	public Vector3() {
 		super();
@@ -25,6 +27,12 @@ public class Vector3 extends com.badlogic.gdx.math.Vector3 {
 	public Vector3 mul(final Matrix4 matrix) {
 		super.mul(matrix);
 		return this;
+	}
+	
+	public Vector2 toVector2D() {
+		
+		v2D.set(x, y);
+		return v2D;
 	}
 
 	@Override

@@ -13,7 +13,7 @@ import org.engine.gui.input.InputEvent;
 import org.engine.gui.output.Graphics;
 import org.engine.language.BasicDefaultLanguage;
 import org.engine.network.Server;
-import org.engine.object.BasicObject;
+import org.engine.object.BasicInteractable;
 import org.engine.object.popup.PopupSlave;
 import org.engine.property.Information;
 import org.engine.property.InformationArrayStringException;
@@ -30,7 +30,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 /**
  * The Class TimeMachine.
  */
-public class TimeLineItem extends BasicObject implements PopupSlave,
+public class TimeLineItem extends BasicInteractable implements PopupSlave,
 		Skinnable, MenuItem {
 
 	public static final int iconID = 3;
@@ -437,11 +437,10 @@ public class TimeLineItem extends BasicObject implements PopupSlave,
 
 		setY(40);
 		setX(t.menu.width + 10);
-		untransformedSize.get().x = width - x - 20;
-		untransformedSize.get().y = 25;
-		setSize(untransformedSize.get());
-		setZ(0);
-
+		this.width = width - x - 20;
+		this.height = 25;
+		z.set(0F);
+		
 		iconArea.set(MathUtils.ceil(width / 2 - style.icon.getMinWidth() / 2),
 				MathUtils.ceil(height / 2 - style.icon.getMinHeight() / 2),
 				style.icon.getMinWidth(), style.icon.getMinHeight());

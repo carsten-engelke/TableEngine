@@ -1,12 +1,9 @@
 package org.engine.object.popup;
 
 import org.engine.Layer;
-import org.engine.geometry.Vector3;
 import org.engine.gui.input.InputEvent;
 import org.engine.gui.output.Graphics;
-import org.engine.object.BasicObject;
-import org.engine.property.Information;
-import org.engine.property.Property;
+import org.engine.object.BasicInteractable;
 import org.engine.utils.Array;
 
 import com.badlogic.gdx.graphics.Color;
@@ -15,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-public class Popup extends BasicObject {
+public class Popup extends BasicInteractable {
 
 	class Order {
 
@@ -110,7 +107,7 @@ public class Popup extends BasicObject {
 
 		final boolean wasCatchedByMe = super.input(e, wasCatchedAbove);
 		if ((e.getType() == InputEvent.TYPE_CLICK_POS)
-				&& !getBounds().getRectangle2D().contains(e.getX(), e.getY())) {
+				&& !containsRelative(relativePosition)) {
 			mouseClickedOutside();
 		}
 		return wasCatchedByMe;
@@ -127,8 +124,8 @@ public class Popup extends BasicObject {
 
 		g.setFont(style.font);
 		g.setColor(Color.WHITE);
-		g.drawUI(style.background, getX(), getY(), untransformedSize.get().x,
-				untransformedSize.get().y);
+		g.drawUI(style.background, 0, 0, width,
+				height);
 		for (final Order o : orders) {
 
 			if (o.over) {
@@ -228,23 +225,6 @@ public class Popup extends BasicObject {
 
 		}
 	}
-
-	@Override
-	public Array<Property<?>> getProperties() {
-
-		return null;
-	}
-	
-	@Override
-	public Array<Property<?>> getPropertiesFlaggedOnly() {
-
-		return null;
-	}
-
-	@Override
-	public void setPropertiesFromInformation(Array<Information> a) {
-		
-	}
 	
 	private void updateOrders() {
 
@@ -267,7 +247,7 @@ public class Popup extends BasicObject {
 		for (final Order order : orders) {
 			order.bounds.width = maxWidth;
 		}
-		untransformedSize.set(new Vector3(maxWidth, cumulativeHeight, 1));
+		setSize(maxWidth, cumulativeHeight);
 	}
 
 	@Override

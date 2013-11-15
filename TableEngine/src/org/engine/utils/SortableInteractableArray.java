@@ -15,8 +15,8 @@ import com.badlogic.gdx.utils.Sort;
  */
 public class SortableInteractableArray extends Array<Interactable> {
 
-	/** The Constant COMPARE_X. */
-	public static final Comparator<Interactable> COMPARE_X = new XSyncComparator();
+//	/** The Constant COMPARE_X. */
+//	public static final Comparator<Interactable> COMPARE_X = new XSyncComparator();
 
 	public static final Comparator<Interactable> COMPARE_Z_HIGHEST_ABOVE = new ZSyncHighestAboveComparator();
 
@@ -43,23 +43,23 @@ public class SortableInteractableArray extends Array<Interactable> {
 	}
 }
 
-class XSyncComparator implements Comparator<Interactable> {
-
-	@Override
-	public int compare(final Interactable o1, final Interactable o2) {
-
-		return (int) (o2.getBounds().getZ() - o1.getBounds().getZ());
-
-	}
-
-}
+//class XSyncComparator implements Comparator<Interactable> {
+//
+//	@Override
+//	public int compare(final Interactable o1, final Interactable o2) {
+//
+//		return (int) (o2.getPosition().z - o1.getPosition().z);
+//
+//	}
+//
+//}
 
 class ZSyncHighestAboveComparator implements Comparator<Interactable> {
 
 	@Override
 	public int compare(final Interactable o1, final Interactable o2) {
 
-		return (int) (o1.getBounds().getZ() - o2.getBounds().getZ());
+		return (int) (o1.depth() - o2.depth());
 	}
 
 	@Override
@@ -73,7 +73,7 @@ class ZSyncHighestBelowComparator implements Comparator<Interactable> {
 	@Override
 	public int compare(final Interactable o1, final Interactable o2) {
 
-		return (int) (o2.getBounds().getZ() - o1.getBounds().getZ());
+		return (int) (o2.depth() - o1.depth());
 	}
 
 	@Override

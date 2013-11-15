@@ -112,7 +112,6 @@ public class InputGenerator extends GestureDetector {
 		} else {
 			zoom = zoom * 2;
 		}
-
 		t.input(new InputEvent(InputEvent.TYPE_ZOOM, Gdx.input
 				.getX(0), Gdx.graphics.getHeight() - Gdx.input.getY(0), zoom));
 		return true;

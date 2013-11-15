@@ -54,10 +54,17 @@ public class Information {
 		}
 		s += "<" + i.id + ": ";
 		try {
+			s+= "{";
 			for (Information subInfo : StringToInformations(i.content)) {
 				s+= ReadableInfoString(subInfo, level +1);
 			}
+			s+= "\n";
+			for (int j = 0; j < level; j++) {
+				s += "    ";
+			}
+			s+= "}>";
 		} catch (Exception e) {
+			s = s.substring(0, s.length() - 1);
 			s += i.content + ">";
 		}
 		return s;
@@ -84,6 +91,7 @@ public class Information {
 			}
 			s += "<" + i.tag + ">" + i.id + "<:" + i.tag + ">" + i.content
 					+ "</" + i.tag + ">";
+			lastTag = i.tag;
 		}
 		return s;
 	}

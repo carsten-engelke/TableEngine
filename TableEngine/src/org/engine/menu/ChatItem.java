@@ -4,7 +4,8 @@ import org.engine.Interactable;
 import org.engine.Layer;
 import org.engine.Skinnable;
 import org.engine.TableEngine;
-import org.engine.geometry.Cube;
+import org.engine.geometry.Rectangle;
+import org.engine.geometry.Vector2;
 import org.engine.gui.input.InputEvent;
 import org.engine.gui.output.Graphics;
 
@@ -13,9 +14,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
-public class ChatItem implements MenuItem, Skinnable, Interactable {
+public class ChatItem extends Rectangle implements MenuItem, Skinnable, Interactable {
 
-	private Cube bounds = new Cube();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Layer l;
 	private TableEngine t;
 	private boolean visible = false;
@@ -23,12 +27,6 @@ public class ChatItem implements MenuItem, Skinnable, Interactable {
 	private String showInput = "";
 	private BlinkingThread blinkThread = null;
 	private ChatItemStyle style;
-
-	@Override
-	public Cube getBounds() {
-
-		return bounds;
-	}
 
 	@Override
 	public Layer getParentLayer() {
@@ -118,12 +116,6 @@ public class ChatItem implements MenuItem, Skinnable, Interactable {
 	}
 
 	@Override
-	public void setBounds(Cube bounds) {
-
-		this.bounds.setBounds(bounds);
-	}
-
-	@Override
 	public void style(Skin skin) {
 
 		style = skin.get("default", ChatItemStyle.class);
@@ -147,8 +139,8 @@ public class ChatItem implements MenuItem, Skinnable, Interactable {
 	@Override
 	public void adaptToScreenSize(int width, int height) {
 
-		bounds.setLocation(t.menu.width + 7, 10, 0);
-		bounds.setSize(width - t.menu.width - 7, style.font.getLineHeight(), 1);
+		setPosition(t.menu.width + 7, 10);
+		setSize(width - t.menu.width - 7, style.font.getLineHeight());
 	}
 
 	@Override
@@ -226,5 +218,23 @@ public class ChatItem implements MenuItem, Skinnable, Interactable {
 				showInput = actualInput;
 			}
 		}
+	}
+
+	@Override
+	public boolean isColliding(Vector2 point) {
+
+		return contains(point);
+	}
+
+	@Override
+	public boolean isColliding(Rectangle r, int angle, float scale) {
+
+		return false;
+	}
+
+	@Override
+	public float depth() {
+
+		return 0;
 	}
 }

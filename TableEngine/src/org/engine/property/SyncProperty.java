@@ -19,7 +19,7 @@ public class SyncProperty implements Property<Synchronizable> {
 	@Override
 	public Information info() {
 		
-		Information.PropertiesToString(value.getProperties());
+		i.content = Information.PropertiesToString(value.getProperties());
 		return i;
 	}
 

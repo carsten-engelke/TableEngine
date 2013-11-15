@@ -5,14 +5,13 @@ import org.engine.Skinnable;
 import org.engine.gui.TransformGUI.TransformView;
 import org.engine.gui.input.InputEvent;
 import org.engine.gui.output.Graphics;
-import org.engine.object.BasicObject;
+import org.engine.object.BasicInteractable;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
-public class CompassItem extends BasicObject implements Skinnable, MenuItem {
+public class CompassItem extends BasicInteractable implements Skinnable, MenuItem {
 
 	public static class CompassItemStyle extends InteractableStyle {
 
@@ -41,14 +40,14 @@ public class CompassItem extends BasicObject implements Skinnable, MenuItem {
 	public void initialize(final Layer l) {
 
 		super.initialize(l);
-		abilities.add(BasicObject.MODE_ROTATE);
+		abilities.add(BasicInteractable.MODE_ROTATE);
 	}
 
 	@Override
 	public void output(final Graphics g) {
 
 		if (visible) {
-			updateAffineTransform();
+			updateTransform();
 			// setSize(getSizeIfTransformWas(untransformedSize, angle, scale)
 			// .getSize());
 			super.output(g);
@@ -73,25 +72,25 @@ public class CompassItem extends BasicObject implements Skinnable, MenuItem {
 	@Override
 	protected void paintTransformed(final Graphics g2d) {
 
-		g2d.drawUI(style.icon, x, y, style.icon.getMinWidth(),
+		g2d.drawUI(style.icon, 0, 0, style.icon.getMinWidth(),
 				style.icon.getMinHeight());
 	}
 
 	@Override
 	protected void paintUntransformed(final Graphics g) {
 
-		g.drawUI(style.background, x, y, untransformedSize.get().x,
-				untransformedSize.get().y);
+		g.drawUI(style.background, x, y, width,
+				height);
 		if (over || rotating) {
 			if (rotating) {
-				g.drawUI(style.down, x, y, untransformedSize.get().x,
-						untransformedSize.get().y);
+				g.drawUI(style.down, x, y, width,
+						height);
 			} else {
-				g.drawUI(style.over, x, y, untransformedSize.get().x,
-						untransformedSize.get().y);
+				g.drawUI(style.over, x, y, width,
+						height);
 			}
 		} else {
-			g.drawUI(style.up, x, y, untransformedSize.get().x, untransformedSize.get().y);
+			g.drawUI(style.up, x, y, width, height);
 		}
 	}
 	
@@ -155,45 +154,19 @@ public class CompassItem extends BasicObject implements Skinnable, MenuItem {
 	}
 
 	@Override
-	protected void updateAffineTransform() {
-
-		transformMatrix = new Matrix4();
-
-		// look at the new borders -> transforming will set new borders so
-		// estimate how much translation has to be done. Calculate the
-		// translation into the rotated world of the image and apply it!
-		float dX = getSizeIfTransformWas(untransformedSize.get(), angle.get(), scale.get())
-				.getX();
-		float dY = getSizeIfTransformWas(untransformedSize.get(), angle.get(), scale.get())
-				.getY();
-
-		dX = getX() + (untransformedSize.get().x / 2);
-		dY = getY() + (untransformedSize.get().y / 2);
-		transformMatrix.translate(dX, dY, 0);
-		transformMatrix.rotate(0, 0, 1, angle.get());
-		transformMatrix.translate(-dX, -dY, 0);
-
-		// rotate image around the position of object
-		invertedTransform = new Matrix4(transformMatrix);
-		invertedTransform.inv();
-	}
-
-	@Override
 	public void style(Skin skin) {
 
 		style = skin.get("default", CompassItemStyle.class);
-		untransformedSize.get().x = style.icon.getMinWidth();
-		untransformedSize.get().y = style.icon.getMinHeight();
-		setSize(untransformedSize.get());
+		width = style.icon.getMinWidth();
+		height = style.icon.getMinHeight();
 	}
 
 	@Override
 	public void style(Skin skin, String style) {
 
 		this.style = skin.get(style, CompassItemStyle.class);
-		untransformedSize.get().x = this.style.icon.getMinWidth();
-		untransformedSize.get().y = this.style.icon.getMinHeight();
-		setSize(untransformedSize.get());
+		width = this.style.icon.getMinWidth();
+		height = this.style.icon.getMinHeight();
 	}
 
 	@Override
@@ -202,17 +175,16 @@ public class CompassItem extends BasicObject implements Skinnable, MenuItem {
 		if (CompassItemStyle.class.isAssignableFrom(style.getClass())) {
 
 			this.style = (CompassItemStyle) style;
-			untransformedSize.get().x = this.style.icon.getMinWidth();
-			untransformedSize.get().y = this.style.icon.getMinHeight();
-			setSize(untransformedSize.get());
+			width = this.style.icon.getMinWidth();
+			height = this.style.icon.getMinHeight();
 		}
 	}
 
 	@Override
 	public void adaptToScreenSize(int width, int height) {
 
-		setLocation(MathUtils.ceil(width / 2 - untransformedSize.get().x / 2),
-				MathUtils.ceil(height / 2 - untransformedSize.get().y / 2), depth);
+		setPosition(MathUtils.ceil(width / 2 - this.width / 2),
+				MathUtils.ceil(height / 2 - this.height / 2));
 	}
 
 	@Override

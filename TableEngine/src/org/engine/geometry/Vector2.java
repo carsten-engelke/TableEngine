@@ -11,6 +11,8 @@ public class Vector2 extends com.badlogic.gdx.math.Vector2 {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private static final Vector3 v3D = new Vector3();
+	
 	public Vector2() {
 		super();
 	}
@@ -24,6 +26,12 @@ public class Vector2 extends com.badlogic.gdx.math.Vector2 {
 
 		return Array.ENUM_START + x + Array.ENUM_DELIMITER
 				+ y + Array.ENUM_END;
+	}
+	
+	public Vector3 toVector3() {
+		
+		v3D.set(x, y, 0);
+		return v3D;
 	}
 
 	public void fromString(String s) {

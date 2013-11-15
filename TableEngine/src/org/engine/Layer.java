@@ -1,7 +1,7 @@
 package org.engine;
 
 import org.engine.gui.GUI;
-import org.engine.gui.GUI.GUIProperty;
+import org.engine.gui.GUIProperty;
 import org.engine.object.Object;
 import org.engine.property.BooleanProperty;
 import org.engine.property.Information;
@@ -119,7 +119,8 @@ public class Layer {
 
 			Array<Property<?>> propertyArray = new Array<Property<?>>(
 					new Property<?>[] { depth, gui, label, persistent });
-			for (Interactable i : this.a) {
+			for (Interactable i : a) {
+
 				if (Property.class.isAssignableFrom(i.getClass())) {
 					propertyArray.add(((Property<?>) i));
 				}

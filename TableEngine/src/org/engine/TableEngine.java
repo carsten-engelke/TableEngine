@@ -6,8 +6,10 @@ import java.util.Locale;
 import org.engine.Layer.SyncLayer;
 import org.engine.Player.PlayerArrayProperty;
 import org.engine.debug.DebugWindow;
+import org.engine.debug.TestInteractable;
 import org.engine.gui.PlainGUI;
 import org.engine.gui.TransformGUI;
+import org.engine.gui.TransformGUI.TransformView;
 import org.engine.gui.input.InputEvent;
 import org.engine.gui.input.InputGenerator;
 import org.engine.gui.output.Graphics;
@@ -84,7 +86,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	public final static String PREFERENCES_LOCATION = "TableEngine";
 
 	public Array<String> debugOrderList = new Array<String>();
-	public boolean debugMode = false;
+//	public boolean debugMode = false;
 	private Language defLang;
 	private Language language;
 	public Network net;
@@ -245,6 +247,9 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 				}
 				outputLayerList.addAll(layerList);
 				inputLayerList.addAll(layerList);
+				objectLayer.addInteractable(new TestInteractable());
+				objectLayer.addInteractable(new TestInteractable());
+
 
 				// Load entry stage class if available
 				if (def.getEntryStage() != null) {
@@ -422,7 +427,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		String content = preferences.getString("playerID") + ";"
 				+ preferences.getString("playerName") + ";"
 				+ preferences.getString("playerAvatar") + ";"
-				+ preferences.getString("playerView");
+				+ TransformView.fromTableEngineToString(this);
 		if (playerList.contains(id)) {
 			if (!playerList.getByID(id).toString().equals(content)) {
 				playerList.getByID(id).fromString(content);
@@ -520,12 +525,13 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	public Array<Property<?>> getProperties() {
 
 		Array<Property<?>> propertyArray = new Array<Property<?>>(new Property<?>[] { animationList, banList, chatList,
-				playerList, objID });
+				playerList });
 
 		for (SyncProperty p : syncLayerList) {
 
 			propertyArray.add(p);
 		}
+		propertyArray.add(objID);
 		return propertyArray;
 	}
 
@@ -644,7 +650,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		
 		TableEngine t = new TableEngine();
 		new LwjglApplication(t, cfg);
-		new DebugWindow(t).open();
+		if (args[0] != null) {
+			if (args[0].equals("debug")) {
+				new DebugWindow(t).open();
+			}
+		}
+		System.out.println(t.getPrefBoolean("debug") + " debug");
 	}
 
 	public String getPrefString(String key) {

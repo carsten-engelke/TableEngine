@@ -2,30 +2,30 @@ package org.engine.debug;
 
 import java.io.IOException;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Group;
-import org.engine.TableEngine;
-import org.engine.property.Information;
-import org.engine.resource.BasicResource;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Text;
+import org.engine.TableEngine;
+import org.engine.property.Information;
+import org.engine.resource.BasicResource;
 
 public class DebugWindow {
 
@@ -185,6 +185,18 @@ public class DebugWindow {
 
 		MenuItem mntmManualmode = new MenuItem(menu_3, SWT.RADIO);
 		mntmManualmode.setText("MANUAL_MODE");
+		
+		final MenuItem mntmDebugMode = new MenuItem(menu_1, SWT.CHECK);
+		mntmDebugMode.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (engine != null) {
+					engine.preferences.putBoolean("debug", mntmDebugMode.getSelection());
+				}
+			}
+		});
+		mntmDebugMode.setSelection(true);
+		mntmDebugMode.setText("Debug Mode");
 
 		TabFolder tabFolder = new TabFolder(shlDebug, SWT.NONE);
 

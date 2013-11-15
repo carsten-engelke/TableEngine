@@ -8,16 +8,18 @@ IDEEN:
   mit letzem Timestamp nur die nachfolgenden senden.
 
 TODO:
- - Animationen zeitabhängig (delta-Time-millis) designen
- - Scale-Fähigkeit des BasicSynchronizable reparieren
  - Sound-Effekte einstreuen
  - Network zum Laufen bringen
  - Debug Mode
  - Mapping Mode
  - BasicDefaultLanguage sortieren
  - Objekt-Klassen auslagern
- 
+ - ALLE KLASSEN ÖKONOMISIEREN (wiederverwendete Klassen nicht jedesmal neu erstellen sondern nur signifikante Werte zuweisen)
+ - Input an LibGdx namentlich angleichen.
+ - BasicObject in BasicInteractable aufteilen
+ - BasicObject AffineTransform Shift einbauen!!!
  DONE:
+ - Scale-Fähigkeit des BasicSynchronizable reparieren
  - Access an die Universe class angleichen: parentUniverse statt getParentLayer().getParentUniverse()
  - Verschiedene Auflösungen einbauen.
  - Menü-Style anpassen 

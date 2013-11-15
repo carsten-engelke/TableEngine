@@ -344,12 +344,12 @@ public class BasicResource implements Resource {
 			p.putString("playerName", "Player");
 			p.putString("playerAvatar", "0");
 			p.putString("playerID", "player.name@player.com");
-			p.putString("playerView",
-					new TransformGUI.TransformView().toString());
+			new TransformGUI.TransformView().toPreferences(p);
 			p.putString("language", Locale.getDefault().toLanguageTag());
 			p.putBoolean("showCompass", true);
 			p.putBoolean("showTimeLine", true);
 			p.putBoolean("showChat", true);
+			p.putBoolean("debug", false);
 			try {
 				BufferedReader br = new BufferedReader(new FileReader(Gdx.files
 						.internal("basic/server").file()));

@@ -1,7 +1,8 @@
 package org.engine;
 
 import org.engine.Skinnable.Style;
-import org.engine.geometry.Cube;
+import org.engine.geometry.Rectangle;
+import org.engine.geometry.Vector2;
 import org.engine.gui.input.InputEvent;
 import org.engine.gui.output.Graphics;
 
@@ -11,7 +12,11 @@ public interface Interactable {
 
 	float START_Z_VALUE = 10000;
 	
-	public Cube getBounds();
+	public boolean isColliding(Vector2 point);
+	
+	public boolean isColliding(Rectangle r, int angle, float scale);
+	
+	public float depth();
 
 	public Layer getParentLayer();
 
@@ -20,8 +25,6 @@ public interface Interactable {
 	public boolean input(InputEvent e, boolean wasCatchedAbove);
 
 	public void output(Graphics g);
-
-	public void setBounds(Cube bounds);
 	
 	public interface Animateable extends Interactable {
 
