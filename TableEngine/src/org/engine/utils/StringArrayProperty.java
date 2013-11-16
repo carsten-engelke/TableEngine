@@ -6,12 +6,11 @@ public class StringArrayProperty implements Property<Array<String>> {
 
 		private Array<String> value;
 		private Information i;
-		private boolean flagged = false;
 
-		public StringArrayProperty(String id, String tag, Array<String> value) {
+		public StringArrayProperty(String id, String tag, Flag f, Array<String> value) {
 
 			this.value = value;
-			i = new Information(id, tag, "");
+			i = new Information(id, tag, f, "");
 			i.content = getInfoStr();
 		}
 
@@ -86,14 +85,14 @@ public class StringArrayProperty implements Property<Array<String>> {
 		}
 
 		@Override
-		public boolean isFlagged() {
+		public Flag flag() {
 
-			return flagged;
+			return i.flag;
 		}
 
 		@Override
-		public void setFlagged(boolean flagged) {
+		public void setFlag(Flag f) {
 
-			this.flagged = flagged;
+			i.flag = f;
 		}
 	}

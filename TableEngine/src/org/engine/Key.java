@@ -1,7 +1,20 @@
 package org.engine;
 
+/**
+ * The Key class is able to provide an String key from an Integer that is
+ * usually the gameID. Hence the php-Server contains a deconstructing
+ * counterpart, this can be used to verify if the user has a valid key. (E.g.
+ * after paying). Very basic stuff though, is easily hackable I guess.
+ */
 public class Key {
 
+	/**
+	 * Creates a String key from the Integer gameID. Use to provide a user with a key.
+	 * 
+	 * @param code
+	 *            the gameID. 
+	 * @return the key.
+	 */
 	public static String create(int code) {
 
 		if ((code < 100) || (code > 999)) {

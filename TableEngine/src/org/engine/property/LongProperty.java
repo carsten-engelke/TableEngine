@@ -4,12 +4,11 @@ public class LongProperty implements Property<Long> {
 
 	private long value;
 	private Information i;
-	private boolean flagged = false;
 
-	public LongProperty(String id, String tag, long value) {
+	public LongProperty(String id, String tag, Flag f, long value) {
 
 		this.value = value;
-		i = new Information(id, tag, String.valueOf(value));
+		i = new Information(id, tag, f, String.valueOf(value));
 	}
 
 	public Information info() {
@@ -38,13 +37,13 @@ public class LongProperty implements Property<Long> {
 	}
 
 	@Override
-	public boolean isFlagged() {
-		return flagged;
+	public Flag flag() {
+		return i.flag;
 	}
 
 	@Override
-	public void setFlagged(boolean flagged) {
+	public void setFlag(Flag f) {
 
-		this.flagged = flagged;
+		this.i.flag = f;
 	}
 }

@@ -9,6 +9,13 @@ import org.engine.utils.Array;
 
 public class BasicObject extends BasicInteractable implements Object, Synchronizable{
 
+	/**
+	 * 1 : Basic Drag n Drop
+	 * 2 : Synchronization
+	 * 3 : Affine Transform added
+	 */
+	private static final long serialVersionUID = 3L;
+
 	@Override
 	public void setPropertiesFromInformation(final Array<Information> a) {
 
@@ -31,13 +38,13 @@ public class BasicObject extends BasicInteractable implements Object, Synchroniz
 	}
 
 	@Override
-	public Array<Property<?>> getPropertiesFlaggedOnly() {
+	public Array<Property<?>> getPropertiesFlagged() {
 
 		Property<?>[] props = new Property<?>[] { metrics, z, shiftGrid,
 				resizeGrid, rotateGrid, angle, scale };
 		Array<Property<?>> retProps = new Array<Property<?>>(props.length);
 		for (Property<?> p : props) {
-			if (p.isFlagged()) {
+			if (p.flag() != Property.Flag.NONE) {
 				retProps.add(p);
 			}
 		}
@@ -48,9 +55,9 @@ public class BasicObject extends BasicInteractable implements Object, Synchroniz
 	}
 
 	@Override
-	public boolean isFlagged() {
+	public Flag flag() {
 
-		return flagged;
+		return i.flag;
 	}
 	
 	@Override
@@ -98,9 +105,9 @@ public class BasicObject extends BasicInteractable implements Object, Synchroniz
 	}
 
 	@Override
-	public void setFlagged(boolean flagged) {
+	public void setFlag(Flag f) {
 
-		this.flagged = flagged;
+		i.flag = f;
 	}
 
 }

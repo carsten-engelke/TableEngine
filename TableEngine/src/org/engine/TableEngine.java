@@ -23,6 +23,7 @@ import org.engine.network.ServerNetwork;
 import org.engine.property.Information;
 import org.engine.property.LongProperty;
 import org.engine.property.Property;
+import org.engine.property.Property.Flag;
 import org.engine.property.SyncProperty;
 import org.engine.resource.BasicResource;
 import org.engine.resource.Resource;
@@ -80,7 +81,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 			SortableLayerArray.COMPARE_DEPTH_HIGHEST_ABOVE);
 	private SortableLayerArray inputLayerList = new SortableLayerArray(
 			SortableLayerArray.COMPARE_DEPTH_HIGHEST_BELOW);
-	private LongProperty objID = new LongProperty("OBJID", TABLE_ENGINE_TAG, 0L);
+	private LongProperty objID = new LongProperty("OBJID", TABLE_ENGINE_TAG, Flag.NONE, 0L);
 
 	public Preferences preferences;
 	public final static String PREFERENCES_LOCATION = "TableEngine";
@@ -102,15 +103,15 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	public static final int PLAYER_LIMIT = 16;
 
 	private StringArrayProperty animationList = new StringArrayProperty(
-			"ANIMATIONS", TABLE_ENGINE_TAG, new Array<String>(ANIMATION_LIMIT,
+			"ANIMATIONS", TABLE_ENGINE_TAG, Flag.NONE, new Array<String>(ANIMATION_LIMIT,
 					ANIMATION_LIMIT));
 	private Array<String> performedAnimations = new Array<String>();
 	public StringArrayProperty banList = new StringArrayProperty("BANS",
-			TABLE_ENGINE_TAG, new Array<String>());
+			TABLE_ENGINE_TAG, Flag.NONE, new Array<String>());
 	public StringArrayProperty chatList = new StringArrayProperty("CHATS",
-			TABLE_ENGINE_TAG, new Array<String>(CHAT_LIMIT, CHAT_LIMIT));
+			TABLE_ENGINE_TAG, Flag.NONE, new Array<String>(CHAT_LIMIT, CHAT_LIMIT));
 	private PlayerArrayProperty playerList = new PlayerArrayProperty("PLAYERS",
-			TABLE_ENGINE_TAG, new Array<Player>(PLAYER_LIMIT, PLAYER_LIMIT));
+			TABLE_ENGINE_TAG, Flag.NONE, new Array<Player>(PLAYER_LIMIT, PLAYER_LIMIT));
 
 	private int waitingForSend = 0;
 	public static final int REQUEST_LOG_LIMIT = 10;
@@ -220,7 +221,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 				SyncLayer objectLayer = new SyncLayer(new TransformGUI(), OBJECT_LAYER,
 						-100, true);
 				objectLayer.initialize(this);
-				syncLayerList.add(new SyncProperty(OBJECT_LAYER, TABLE_ENGINE_TAG, objectLayer));
+				syncLayerList.add(new SyncProperty(OBJECT_LAYER, TABLE_ENGINE_TAG, Flag.NONE, objectLayer));
 				layerList.add(objectLayer);
 				Layer popupLayer = new Layer(new PlainGUI(), POPUP_LAYER, -90,
 						true);
@@ -241,7 +242,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 						layerList.add(l);
 						if (Synchronizable.class.isAssignableFrom(l.getClass())) {
 							syncLayerList.add(new SyncProperty(l.label.get(),
-									TABLE_ENGINE_TAG, (Synchronizable) l));
+									TABLE_ENGINE_TAG, Flag.NONE, (Synchronizable) l));
 						}
 					}
 				}
@@ -431,14 +432,14 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		if (playerList.contains(id)) {
 			if (!playerList.getByID(id).toString().equals(content)) {
 				playerList.getByID(id).fromString(content);
-				playerList.setFlagged(true);
+				playerList.setFlag(Flag.ADD_CHANGE);
 				requestSend();
 			}
 		} else {
 			Player p = new Player();
 			p.fromString(content);
 			playerList.get().add(p);
-			playerList.setFlagged(true);
+			playerList.setFlag(Flag.ADD_CHANGE);
 			requestSend();
 		}
 	}
@@ -536,21 +537,21 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	}
 
 	@Override
-	public Array<Property<?>> getPropertiesFlaggedOnly() {
+	public Array<Property<?>> getPropertiesFlagged() {
 
 		Array<Property<?>> propertyArray = new Array<Property<?>>();
 		Property<?>[] ap = new Property[] { animationList, banList, chatList,
 				playerList, objID };
 		for (Property<?> p : ap) {
 
-			if (p.isFlagged()) {
+			if (p.flag() != Property.Flag.NONE) {
 				propertyArray.add(p);
 			}
 		}
 
 		for (SyncProperty p : syncLayerList) {
 
-			if (p.isFlagged()) {
+			if (p.flag() != Flag.NONE) {
 				propertyArray.add(p);
 			}
 		}

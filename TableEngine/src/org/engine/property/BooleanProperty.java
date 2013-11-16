@@ -4,12 +4,11 @@ public class BooleanProperty implements Property<Boolean> {
 
 	private boolean value;
 	private Information i;
-	private boolean flagged = false;
 
-	public BooleanProperty(String id, String tag, boolean value) {
+	public BooleanProperty(String id, String tag, Flag f, boolean value) {
 
 		this.value = value;
-		i = new Information(id, tag, String.valueOf(value));
+		i = new Information(id, tag, f, String.valueOf(value));
 	}
 
 	public Information info() {
@@ -37,14 +36,14 @@ public class BooleanProperty implements Property<Boolean> {
 	}
 
 	@Override
-	public boolean isFlagged() {
+	public Flag flag() {
 
-		return flagged;
+		return i.flag;
 	}
 
 	@Override
-	public void setFlagged(boolean flagged) {
+	public void setFlag(Flag f) {
 
-		this.flagged = flagged;
+		i.flag = f;
 	}
 }

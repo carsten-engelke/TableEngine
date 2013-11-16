@@ -7,25 +7,24 @@ public class SyncProperty implements Property<Synchronizable> {
 
 	private Synchronizable value;
 	private Information i;
-	private boolean flagged = false;
 
-	public SyncProperty(String id, String tag, Synchronizable value) {
+	public SyncProperty(String id, String tag, Flag f, Synchronizable value) {
 
 		this.value = value;
-		this.i = new Information(id, tag,
-				Information.PropertiesToString(value.getProperties()));
+		this.i = new Information(id, tag, f, Information.PropertiesToString(value
+						.getProperties()));
 	}
 
 	@Override
 	public Information info() {
-		
+
 		i.content = Information.PropertiesToString(value.getProperties());
 		return i;
 	}
 
 	public Information infoFlaggedOnly() {
 
-		Array<Property<?>> a = value.getPropertiesFlaggedOnly();
+		Array<Property<?>> a = value.getPropertiesFlagged();
 		if (a != null && a.getSize() > 0) {
 			i.content = Information.PropertiesToString(a);
 			return i;
@@ -64,17 +63,20 @@ public class SyncProperty implements Property<Synchronizable> {
 	}
 
 	@Override
-	public boolean isFlagged() {
-		if (value.getPropertiesFlaggedOnly().getSize() > 0) {
-			return true;
-		} else {
-			return flagged;
+	public Flag flag() {
+
+		if (i.flag == Flag.NONE) {
+			if (value.getPropertiesFlagged() != null
+					&& value.getPropertiesFlagged().getSize() > 0) {
+				i.flag = Flag.ADD_CHANGE;
+			}
 		}
+		return i.flag;
 	}
 
 	@Override
-	public void setFlagged(boolean flagged) {
+	public void setFlag(Flag f) {
 
-		this.flagged = flagged;
+		this.i.flag = f;
 	}
 }

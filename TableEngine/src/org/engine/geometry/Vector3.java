@@ -67,12 +67,11 @@ public class Vector3 extends com.badlogic.gdx.math.Vector3 {
 
 		private Vector3 value;
 		private Information i;
-		private boolean flagged;
 
-		public Vector3Property(String id, String tag, Vector3 value) {
+		public Vector3Property(String id, String tag, Flag f, Vector3 value) {
 			
 			this.value = value;
-			this.i = new Information(id, tag, value.toString());
+			this.i = new Information(id, tag, f, value.toString());
 		}
 		@Override
 		public Information info() {
@@ -104,14 +103,14 @@ public class Vector3 extends com.badlogic.gdx.math.Vector3 {
 			i.content = value.toString();
 		}
 		@Override
-		public void setFlagged(boolean flagged) {
+		public void setFlag(Flag f) {
 
-			this.flagged = flagged;
+			i.flag = f;
 		}
 		@Override
-		public boolean isFlagged() {
+		public Flag flag() {
 
-			return flagged;
+			return i.flag;
 		}
 		
 	}

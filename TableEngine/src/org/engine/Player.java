@@ -33,13 +33,12 @@ public class Player {
 
 		private Array<Player> value;
 		private Information i;
-		private boolean flagged = false;
 		
-		public PlayerArrayProperty(String id, String tag,
+		public PlayerArrayProperty(String id, String tag, Flag f,
 				Array<Player> value) {
 
 			this.value = value;
-			i = new Information(id, tag, "");
+			i = new Information(id, tag, f, "");
 			i.content = getInfoString();
 		}
 
@@ -116,15 +115,15 @@ public class Player {
 		}
 
 		@Override
-		public boolean isFlagged() {
+		public Flag flag() {
 
-			return flagged;
+			return i.flag;
 		}
 
 		@Override
-		public void setFlagged(boolean flagged) {
+		public void setFlag(Flag f) {
 			
-			this.flagged = flagged;
+			i.flag = f;
 		}
 	}
 }

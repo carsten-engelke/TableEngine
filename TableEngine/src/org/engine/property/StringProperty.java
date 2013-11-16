@@ -3,11 +3,10 @@ package org.engine.property;
 public class StringProperty implements Property<String> {
 
 	private Information i;
-	private boolean flagged = false;
 
-	public StringProperty(String id, String tag, String content) {
+	public StringProperty(String id, String tag, Flag f, String content) {
 
-		i = new Information(id, tag, content);
+		i = new Information(id, tag, f, content);
 	}
 
 	public void applySyncInfo(Information i) {
@@ -33,14 +32,14 @@ public class StringProperty implements Property<String> {
 	}
 
 	@Override
-	public boolean isFlagged() {
+	public Flag flag() {
 
-		return flagged;
+		return i.flag;
 	}
 
 	@Override
-	public void setFlagged(boolean flagged) {
+	public void setFlag(Flag f) {
 
-		this.flagged = flagged;
+		this.i.flag = f;
 	}
 }

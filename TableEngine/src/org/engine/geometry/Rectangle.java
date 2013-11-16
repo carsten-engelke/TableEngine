@@ -52,15 +52,12 @@ public class Rectangle extends com.badlogic.gdx.math.Rectangle {
 	public static class RectangleProperty implements Property<Rectangle> {
 
 		private final Rectangle value = new Rectangle();
-		private final Information i = new Information("", "", "");
-		public boolean flagged = false;
+		private final Information i;
 		
-		public RectangleProperty(String id, String tag, Rectangle value) {
+		public RectangleProperty(String id, String tag, Flag f, Rectangle value) {
 			
-			this.i.id = i.id;
-			this.i.tag = i.tag;
-			this.i.content = value.asString();
 			this.value.applyString(value.asString());
+			i = new Information(id, tag, f, value.asString());
 		}
 		@Override
 		public Information info() {
@@ -70,15 +67,15 @@ public class Rectangle extends com.badlogic.gdx.math.Rectangle {
 		}
 
 		@Override
-		public void setFlagged(boolean flagged) {
+		public void setFlag(Flag flag) {
 
-			this.flagged = flagged;
+			this.i.flag = flag;
 		}
 
 		@Override
-		public boolean isFlagged() {
+		public Flag flag() {
 
-			return flagged;
+			return i.flag;
 		}
 
 		@Override

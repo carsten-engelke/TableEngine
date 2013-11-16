@@ -25,7 +25,10 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.engine.TableEngine;
 import org.engine.property.Information;
+import org.engine.property.InformationArrayStringException;
+import org.engine.property.Property.Flag;
 import org.engine.resource.BasicResource;
+import org.engine.utils.Array;
 
 public class DebugWindow {
 
@@ -39,6 +42,7 @@ public class DebugWindow {
 	private Text text_5;
 	private Text text_6;
 	private Text textContent;
+	private Text text;
 
 	/**
 	 * Launch the application.
@@ -380,6 +384,44 @@ public class DebugWindow {
 		text_6 = new Text(composite, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		text_6.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
+		
+		TabItem tbtmTest = new TabItem(tabFolder, SWT.NONE);
+		tbtmTest.setText("Test");
+		
+		Composite composite_1 = new Composite(tabFolder, SWT.NONE);
+		tbtmTest.setControl(composite_1);
+		composite_1.setLayout(new GridLayout(3, false));
+		
+		Button btnNewButton = new Button(composite_1, SWT.NONE);
+		btnNewButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Information i = new Information("ID", "TAG", Flag.ADD_CHANGE, "CONTENT");
+				Information i2 = new Information("ID2", "TAG", Flag.REMOVE, "CONTENT2");
+				Array<Information> ai = new Array<Information>();
+				ai.add(i);
+				ai.add(i2);
+				text.setText(Information.InformationsToString(ai));
+			}
+		});
+		btnNewButton.setText("Create StringFromInfos");
+		
+		text = new Text(composite_1, SWT.BORDER);
+		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		
+		Button btnCreateInfoFrom = new Button(composite_1, SWT.NONE);
+		btnCreateInfoFrom.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					Array<Information> i = Information.StringToInformations(text.getText());
+					System.out.println("SUCCESS: " + i.toString());
+				} catch (InformationArrayStringException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		btnCreateInfoFrom.setText("Create Info from String");
 
 	}
 
@@ -389,7 +431,7 @@ public class DebugWindow {
 
 			textContent.setText("");
 			for (Information i : Information.PropertiesToInformations(engine
-					.getPropertiesFlaggedOnly())) {
+					.getPropertiesFlagged())) {
 				textContent.append(Information.ReadableInfoString(i, 0));
 			}
 		}

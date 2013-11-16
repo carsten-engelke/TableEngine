@@ -1,5 +1,6 @@
 package org.engine.property;
 
+import org.engine.property.Property.Flag;
 import org.engine.utils.Array;
 import org.engine.utils.ArrayMap;
 
@@ -8,31 +9,61 @@ public class Information {
 	public String id;
 	public String tag;
 	public String content;
+	public Flag flag;
 
-	public Information(String id, String tag, String content) {
+	public Information(String id, String tag, Flag flag, String content) {
 
 		this.id = id;
 		this.tag = tag;
 		this.content = content;
+		this.flag = flag;
 	}
-	
+
 	public String toString() {
-		
+
 		return Information.InformationToString(this);
 	}
-	
+
+	public static char FlagToString(Flag f) {
+
+		if (f == Flag.NONE) {
+			return '0';
+		}
+		if (f == Flag.ADD_CHANGE) {
+			return '+';
+		}
+		if (f == Flag.REMOVE) {
+			return '-';
+		}
+		return ' ';
+	}
+
+	public static Flag StringToFlag(String s) {
+		if (s.startsWith("0")) {
+			return Flag.NONE;
+		}
+		if (s.startsWith("+")) {
+			return Flag.ADD_CHANGE;
+		}
+		if (s.startsWith("-")) {
+			return Flag.REMOVE;
+		}
+		return null;
+	}
+
 	public static String PropertyToString(Property<?> p) {
-		
+
 		return InformationToString(p.info());
 	}
-	
+
 	public static String PropertiesToString(Array<Property<?>> ap) {
-		
+
 		return InformationsToString(PropertiesToInformations(ap));
 	}
-	
-	public static Array<Information> PropertiesToInformations(Array<Property<?>> ap) {
-		
+
+	public static Array<Information> PropertiesToInformations(
+			Array<Property<?>> ap) {
+
 		Array<Information> ai = new Array<Information>(ap.getSize());
 		for (Property<?> p : ap) {
 			ai.add(p.info());
@@ -42,8 +73,10 @@ public class Information {
 
 	public static String InformationToString(Information i) {
 
-		return "<" + i.tag + ">" + i.id + "<:" + i.tag + ">" + i.content
-				+ "</" + i.tag + ">";
+		// <TAG>ID<:TAG<>FLAG>CONTENT</TAG>
+		return "<" + i.tag + ">" + i.id + "<:" + i.tag + "<>"
+				+ Information.FlagToString(i.flag) + ">" + i.content + "</"
+				+ i.tag + ">";
 	}
 
 	public static String ReadableInfoString(Information i, int level) {
@@ -54,15 +87,15 @@ public class Information {
 		}
 		s += "<" + i.id + ": ";
 		try {
-			s+= "{";
+			s += "{";
 			for (Information subInfo : StringToInformations(i.content)) {
-				s+= ReadableInfoString(subInfo, level +1);
+				s += ReadableInfoString(subInfo, level + 1);
 			}
-			s+= "\n";
+			s += "\n";
 			for (int j = 0; j < level; j++) {
 				s += "    ";
 			}
-			s+= "}>";
+			s += "}>";
 		} catch (Exception e) {
 			s = s.substring(0, s.length() - 1);
 			s += i.content + ">";
@@ -89,8 +122,9 @@ public class Information {
 			if (lastTag != null && i.tag.equals(lastTag)) {
 				s = s.substring(0, s.lastIndexOf("</" + i.tag + ">"));
 			}
-			s += "<" + i.tag + ">" + i.id + "<:" + i.tag + ">" + i.content
-					+ "</" + i.tag + ">";
+			s += "<" + i.tag + ">" + i.id + "<:" + i.tag + "<>"
+					+ Information.FlagToString(i.flag) + ">" + i.content + "</"
+					+ i.tag + ">";
 			lastTag = i.tag;
 		}
 		return s;
@@ -102,56 +136,55 @@ public class Information {
 		String tag = null;
 		String start = null;
 		String sep = null;
+		Flag flag = null;
 		String end = null;
 		String id = null;
 		String content = null;
 		try {
-
-			tag = input.substring(input.indexOf("<") + 1,
-					input.indexOf(">"));
+			tag = input.substring(input.indexOf("<") + 1, input.indexOf(">"));
 			start = "<" + tag + ">";
-			sep = "<:" + tag + ">";
+			sep = "<:" + tag + "<>";
 			end = "</" + tag + ">";
 			id = input.substring(input.indexOf(start) + start.length(),
 					input.indexOf(sep));
-			content = input.substring(input.indexOf(sep) + sep.length(),
+			flag = Information.StringToFlag(input.substring(input.indexOf(sep)
+					+ sep.length(), input.indexOf(sep) + sep.length() + 1));
+			content = input.substring(
+					input.indexOf(">", input.indexOf(sep) + sep.length()) + 1,
 					input.indexOf(end));
-			return new Information(id, tag, content);
+			return new Information(id, tag, flag, content);
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new InformationStringException(input);
 		}
 
 	}
 
 	public static Array<Information> StringToInformations(String input)
-			throws InformationArrayStringException{
+			throws InformationArrayStringException {
 
 		String tag = null;
 		String start = null;
 		String sep = null;
 		String end = null;
 		String id = null;
+		Flag flag = null;
 		String content = null;
 		Array<Information> a = new Array<Information>();
 		try {
 
-			tag = input.substring(input.indexOf("<") + 1,
-					input.indexOf(">"));
+			tag = input.substring(input.indexOf("<") + 1, input.indexOf(">"));
 			start = "<" + tag + ">";
-			sep = "<:" + tag + ">";
+			sep = "<:" + tag + "<>";
 			end = "</" + tag + ">";
 
 			for (String strBlock : input.split(end)) {
 
 				if (strBlock.contains(start)) {
 
-					// System.out.println("BLOCK:" + strBlock + " START:"
-					// + start + " STARTPOS:"
-					// + strBlock.indexOf(start));
 					String cutOUT = strBlock.substring(0,
 							strBlock.indexOf(start));
-					// cutOUT = strBlock.substring(0, 0);
 					if (!cutOUT.equals("")) {
 						throw new InformationArrayStringException(input
 								+ " CUTOUT: " + cutOUT);
@@ -161,11 +194,13 @@ public class Information {
 
 						if (info.contains(sep)) {
 
-							// System.out.println("PROP: " + prop);
 							id = info.substring(0, info.indexOf(sep));
-							content = info.substring(info.indexOf(sep)
-									+ sep.length());
-							a.add(new Information(id, tag, content));
+							flag = Information.StringToFlag(info.substring(
+									info.indexOf(sep) + sep.length(),
+									info.indexOf(sep) + sep.length() + 1));
+							content = info.substring(info.indexOf(">", info.indexOf(sep)
+									+ sep.length()) + 1);
+							a.add(new Information(id, tag, flag, content));
 
 						} else {
 

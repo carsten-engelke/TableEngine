@@ -4,12 +4,11 @@ public class FloatProperty implements Property<Float> {
 
 	private float value;
 	private Information i;
-	private boolean flagged = false;
 
-	public FloatProperty(String id, String tag, float value) {
+	public FloatProperty(String id, String tag, Flag f, float value) {
 
 		this.value = value;
-		this.i = new Information(id, tag, String.valueOf(value));
+		this.i = new Information(id, tag, f, String.valueOf(value));
 	}
 
 	public Information info() {
@@ -37,14 +36,14 @@ public class FloatProperty implements Property<Float> {
 	}
 
 	@Override
-	public boolean isFlagged() {
+	public Flag flag() {
 
-		return flagged;
+		return i.flag;
 	}
 
 	@Override
-	public void setFlagged(boolean flagged) {
+	public void setFlag(Flag f) {
 
-		this.flagged = flagged;
+		this.i.flag = f;
 	}
 }

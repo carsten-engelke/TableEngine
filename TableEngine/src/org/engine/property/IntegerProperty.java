@@ -4,12 +4,11 @@ public class IntegerProperty implements Property<Integer> {
 
 	private int value = -1;
 	private Information i;
-	private boolean flagged = false;
 
-	public IntegerProperty(String id, String tag, int value) {
+	public IntegerProperty(String id, String tag, Flag f, int value) {
 
 		this.value = value;
-		i = new Information(id, tag, String.valueOf(value));
+		i = new Information(id, tag, f, String.valueOf(value));
 	}
 
 	public Information info() {
@@ -38,14 +37,14 @@ public class IntegerProperty implements Property<Integer> {
 	}
 
 	@Override
-	public boolean isFlagged() {
+	public Flag flag() {
 
-		return flagged;
+		return i.flag;
 	}
 
 	@Override
-	public void setFlagged(boolean flagged) {
+	public void setFlag(Flag f) {
 
-		this.flagged = flagged;
+		this.i.flag = f;
 	}
 }

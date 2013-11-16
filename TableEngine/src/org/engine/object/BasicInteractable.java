@@ -17,6 +17,7 @@ import org.engine.object.popup.PopupSlave;
 import org.engine.property.FloatProperty;
 import org.engine.property.Information;
 import org.engine.property.IntegerProperty;
+import org.engine.property.Property.Flag;
 import org.engine.resource.BasicResource;
 import org.engine.utils.Array;
 import org.engine.utils.MathUtils;
@@ -60,15 +61,15 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	// SIZE AND POSITION
 	public final RectangleProperty metrics = new RectangleProperty("METRICS",
-			OBJECT_TAG, this);
-	public final FloatProperty z = new FloatProperty("Z", OBJECT_TAG, 0.0F);
+			OBJECT_TAG, Flag.NONE, this);
+	public final FloatProperty z = new FloatProperty("Z", OBJECT_TAG, Flag.NONE, 0.0F);
 	public final IntegerProperty shiftGrid = new IntegerProperty("SHIFT-GRID",
-			OBJECT_TAG, 1);
+			OBJECT_TAG, Flag.NONE, 1);
 	protected boolean shifting = false;
 	private final Vector2 dragStartPoint = new Vector2();
 	private float dragStartZ;
 	public final IntegerProperty resizeGrid = new IntegerProperty(
-			"RESIZE-GRID", OBJECT_TAG, 1);
+			"RESIZE-GRID", OBJECT_TAG, Flag.NONE, 1);
 	protected boolean resizing = false;
 	private final Vector2 resizeStartSize = new Vector2();
 	private final Vector2 resizeOldOppositePosition = new Vector2();
@@ -81,19 +82,19 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	// ROTATION
 	public final IntegerProperty angle = new IntegerProperty("ANGLE",
-			OBJECT_TAG, 0);
+			OBJECT_TAG, Flag.NONE, 0);
 	public final IntegerProperty rotateGrid = new IntegerProperty(
-			"ROTATE-GRID", OBJECT_TAG, 90);
+			"ROTATE-GRID", OBJECT_TAG, Flag.NONE, 90);
 	private int rotateStartAngle;
 	private final Vector2 rotateStartMidPoint = new Vector2();
 	private final Vector2 rotateStartPoint = new Vector2();
 	protected boolean rotating = false;
 
 	// SCALING
-	public final FloatProperty scale = new FloatProperty("SCALE", OBJECT_TAG,
+	public final FloatProperty scale = new FloatProperty("SCALE", OBJECT_TAG, Flag.NONE,
 			1.0F);
 	public final FloatProperty scaleGrid = new FloatProperty("SCALE-GRID",
-			OBJECT_TAG, 0.25F);
+			OBJECT_TAG, Flag.NONE, 0.25F);
 	protected boolean scaling = false;
 	private float startScale;
 
@@ -117,7 +118,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	// PROPERTY
 	protected Information i;
-	protected boolean flagged;
+	protected Flag flagged = Flag.NONE;
 
 	// COLLISION DETECTION
 	private final SortableInteractableArray depthList = new SortableInteractableArray();
@@ -219,7 +220,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		t = l.t;
 		style(t.uiSkin, t.uiStyleName);
 		adaptToScreenSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		i = new Information(t.getNewObjectID(getClass()), Layer.LAYER_TAG, "");
+		i = new Information(t.getNewObjectID(getClass()), Layer.LAYER_TAG, Flag.NONE, "");
 	}
 
 	public boolean containsRelative(Vector2 v) {
@@ -708,7 +709,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 					+ resizeStartSize.y + ":" + width + ":" + height + ":"
 					+ dragStartPoint.x + ":" + dragStartPoint.y + ":" + x + ":"
 					+ y + ")");
-			metrics.setFlagged(true);
+			metrics.setFlag(Flag.ADD_CHANGE);
 			Gdx.graphics.requestRendering();
 		}
 	}
@@ -733,7 +734,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			}
 			t.addAnimation(i.id + ":rotate(" + rotateStartAngle + ":" + angle
 					+ ")");
-			angle.setFlagged(true);
+			angle.setFlag(Flag.ADD_CHANGE);
 			Gdx.graphics.requestRendering();
 		}
 	}
@@ -774,8 +775,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			}
 			t.addAnimation(i.id + ":shift(" + dragStartPoint.x + ":"
 					+ dragStartPoint.y + ":" + getX() + ":" + getY() + ")");
-			metrics.setFlagged(true);
-			z.setFlagged(true);
+			metrics.setFlag(Flag.ADD_CHANGE);
+			z.setFlag(Flag.ADD_CHANGE);
 			Gdx.graphics.requestRendering();
 		}
 	}
@@ -805,7 +806,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			scaling = false;
 			t.addAnimation(i.id + ":scale(" + startScale + ":" + scale.get()
 					+ ")");
-			scale.setFlagged(true);
+			scale.setFlag(Flag.ADD_CHANGE);
 			Gdx.graphics.requestRendering();
 		}
 	}
