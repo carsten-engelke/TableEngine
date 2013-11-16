@@ -2,7 +2,6 @@ package org.engine.menu;
 
 import org.engine.Layer;
 import org.engine.Skinnable;
-import org.engine.gui.TransformGUI.TransformView;
 import org.engine.gui.input.InputEvent;
 import org.engine.gui.output.Graphics;
 import org.engine.object.BasicInteractable;
@@ -12,6 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 public class CompassItem extends BasicInteractable implements Skinnable, MenuItem {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public static class CompassItemStyle extends InteractableStyle {
 
@@ -112,27 +116,25 @@ public class CompassItem extends BasicInteractable implements Skinnable, MenuIte
 	 * MouseEvent )
 	 */
 	@Override
-	public boolean posDragged(final InputEvent e) {
+	public boolean touchDrag(final InputEvent e) {
 
-		final boolean wasCatchedByMe = super.posDragged(e);
-		TransformView v = new TransformView(t.getPrefString("playerView"));
-		v.angle = angle.get();
-		t.preferences.putString("playerView", v.toString());
+		final boolean wasCatchedByMe = super.touchDrag(e);
+		t.preferences.putInteger("viewAngle", angle.get());
 		return wasCatchedByMe;
 	}
 
 	@Override
-	public boolean posEntered(final InputEvent e) {
+	public boolean touchEnter(final InputEvent e) {
 
 		over = true;
-		return super.posEntered(e);
+		return super.touchEnter(e);
 	}
 
 	@Override
-	public boolean posExited(final InputEvent e) {
+	public boolean touchExit(final InputEvent e) {
 
 		over = false;
-		return super.posExited(e);
+		return super.touchExit(e);
 	}
 
 	/*
@@ -143,12 +145,10 @@ public class CompassItem extends BasicInteractable implements Skinnable, MenuIte
 	 * MouseEvent)
 	 */
 	@Override
-	public boolean posReleased(final InputEvent e) {
+	public boolean touchUp(final InputEvent e) {
 
-		final boolean wasCatchedByMe = super.posReleased(e);
-		TransformView v = new TransformView(t.getPrefString("playerView"));
-		v.angle = angle.get();
-		t.preferences.putString("playerView", v.toString());
+		final boolean wasCatchedByMe = super.touchUp(e);
+		t.preferences.putInteger("viewAngle", angle.get());
 		return wasCatchedByMe;
 
 	}

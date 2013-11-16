@@ -137,7 +137,7 @@ public class TransformGUI implements GUI {
 		}
 		if (!wasCatchedAbove && v.freeMove) {
 
-			if (e.getType() == InputEvent.TYPE_PRESS_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_DOWN) {
 
 				lastInputPoint = e.getPosition();
 
@@ -155,7 +155,7 @@ public class TransformGUI implements GUI {
 				Gdx.graphics.requestRendering();
 			}
 
-			if (e.getType() == InputEvent.TYPE_RELEASE_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_UP) {
 				dragging = false;
 				rotating = false;
 
@@ -174,7 +174,7 @@ public class TransformGUI implements GUI {
 				return true;
 			}
 
-			if (e.getType() == InputEvent.TYPE_DRAG_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_DRAGGED) {
 
 				if (rotating) {
 
@@ -240,7 +240,7 @@ public class TransformGUI implements GUI {
 
 				}
 			}
-			if (e.getType() == InputEvent.TYPE_ZOOM) {
+			if (e.getType() == InputEvent.TYPE_SCROLLED) {
 				v.scale = e.getIntensity();
 				checkViewLimits();
 				final Vector3 oldCursor = new Vector3(e.getX_on_Screen(),

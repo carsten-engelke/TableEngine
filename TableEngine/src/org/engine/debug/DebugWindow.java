@@ -89,6 +89,8 @@ public class DebugWindow {
 		shlDebug.setSize(640, 480);
 		shlDebug.setText("Debug");
 		shlDebug.setLayout(new FillLayout(SWT.HORIZONTAL));
+		
+		new TestClass().execute();
 
 		Menu menu = new Menu(shlDebug, SWT.BAR);
 		shlDebug.setMenuBar(menu);
@@ -208,7 +210,7 @@ public class DebugWindow {
 
 		Group grpSettings = new Group(sashForm, SWT.NONE);
 		grpSettings.setText("Settings");
-		grpSettings.setLayout(new GridLayout(1, false));
+		grpSettings.setLayout(new GridLayout(2, false));
 
 		Button btnRefreshSettings = new Button(grpSettings, SWT.NONE);
 		btnRefreshSettings.addSelectionListener(new SelectionAdapter() {
@@ -221,11 +223,20 @@ public class DebugWindow {
 		btnRefreshSettings.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
 				true, false, 1, 1));
 		btnRefreshSettings.setText("Refresh Settings");
+		new Label(grpSettings, SWT.NONE);
 
 		textSettings = new Text(grpSettings, SWT.BORDER | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		textSettings.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,
-				1, 1));
+				2, 1));
+		
+		Button btnAddAnimation = new Button(grpSettings, SWT.NONE);
+		btnAddAnimation.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnAddAnimation.setText("Add Animation");
+		
+		Button btnAddPlayer = new Button(grpSettings, SWT.NONE);
+		btnAddPlayer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddPlayer.setText("Add Player");
 
 		Group grpContent = new Group(sashForm, SWT.NONE);
 		grpContent.setText("Content");
@@ -369,9 +380,6 @@ public class DebugWindow {
 		text_6 = new Text(composite, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		text_6.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
-
-		TabItem tbtmServerDebug = new TabItem(tabFolder, SWT.NONE);
-		tbtmServerDebug.setText("Server Debug");
 
 	}
 

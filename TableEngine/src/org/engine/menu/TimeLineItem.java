@@ -183,7 +183,7 @@ public class TimeLineItem extends BasicInteractable implements PopupSlave,
 	 * MouseEvent )
 	 */
 	@Override
-	public boolean posClicked(final InputEvent e) {
+	public boolean touchClick(final InputEvent e) {
 
 		t.setUI(DialogFactory.createQuestionDialog(
 				t.getText(BasicDefaultLanguage.timemachineAsk) + caption + "?",
@@ -201,10 +201,10 @@ public class TimeLineItem extends BasicInteractable implements PopupSlave,
 	 * MouseEvent )
 	 */
 	@Override
-	public boolean posDragged(final InputEvent e) {
+	public boolean touchDrag(final InputEvent e) {
 
 		t.setBlockIncomingNetworkTraffic(true);
-		super.posDragged(e);
+		super.touchDrag(e);
 		CursorX = e.getPosition().x - 1;
 		if (CursorX < getX()) {
 			CursorX = getX();
@@ -226,7 +226,7 @@ public class TimeLineItem extends BasicInteractable implements PopupSlave,
 	 * MouseEvent )
 	 */
 	@Override
-	public boolean posEntered(final InputEvent e) {
+	public boolean touchEnter(final InputEvent e) {
 
 		t.setBlockIncomingNetworkTraffic(true);
 		setReset();
@@ -240,7 +240,7 @@ public class TimeLineItem extends BasicInteractable implements PopupSlave,
 	 * MouseEvent )
 	 */
 	@Override
-	public boolean posExited(final InputEvent e) {
+	public boolean touchExit(final InputEvent e) {
 
 		t.getLayer(TableEngine.OBJECT_LAYER).clear();
 		try {
@@ -261,9 +261,9 @@ public class TimeLineItem extends BasicInteractable implements PopupSlave,
 	 * )
 	 */
 	@Override
-	public boolean posMoved(final InputEvent e) {
+	public boolean touchMove(final InputEvent e) {
 
-		return posDragged(e);
+		return touchDrag(e);
 	}
 
 	/*
@@ -274,7 +274,7 @@ public class TimeLineItem extends BasicInteractable implements PopupSlave,
 	 * MouseEvent)
 	 */
 	@Override
-	public boolean posReleased(final InputEvent e) {
+	public boolean touchUp(final InputEvent e) {
 
 		if (shifting) {
 

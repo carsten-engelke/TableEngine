@@ -71,6 +71,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			"RESIZE-GRID", OBJECT_TAG, 1);
 	protected boolean resizing = false;
 	private final Vector2 resizeStartSize = new Vector2();
+	private final Vector2 resizeOldOppositePosition = new Vector2();
+	private final Vector2 resizeNewOppositePosition = new Vector2();
 	private ResizingPoint resizeArea;
 	private final Rectangle ll = new Rectangle();
 	private final Rectangle lr = new Rectangle();
@@ -241,7 +243,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		updateTransform();
 
 		// See if the MOVE-EVENT is for this instance a ENTER OR EXIT EVENT.
-		if (e.getType() == InputEvent.TYPE_MOVE_POS) {
+		if (e.getType() == InputEvent.TYPE_TOUCH_MOVED) {
 
 			if (containsRelative(lastRelativeInputPosition)
 					&& containsRelative(relativePosition)) {
@@ -251,16 +253,16 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 					// this is the topmost object
 					if (wasCatchedByMe) {
 						// was last time in area
-						isCatchedByMe = posMoved(e);
+						isCatchedByMe = touchMove(e);
 					} else {
 						// was last time not in area
-						isCatchedByMe = posEntered(e);
+						isCatchedByMe = touchEnter(e);
 					}
 				} else {
 					// this is not the topmost object
 					if (wasCatchedByMe) {
 						// was last time in area, is now in overlying object
-						isCatchedByMe = posExited(e);
+						isCatchedByMe = touchExit(e);
 					}
 				}
 			}
@@ -268,35 +270,35 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			if (!containsRelative(lastRelativeInputPosition)
 					&& containsRelative(relativePosition) && !wasCatchedAbove) {
 
-				isCatchedByMe = posEntered(e);
+				isCatchedByMe = touchEnter(e);
 
 			}
 
 			if (containsRelative(lastRelativeInputPosition)
 					&& !containsRelative(relativePosition) && wasCatchedByMe) {
 
-				isCatchedByMe = posExited(e);
+				isCatchedByMe = touchExit(e);
 			}
 
 		}
-		if ((e.getType() >= InputEvent.TYPE_POS_MIN)
-				&& (e.getType() <= InputEvent.TYPE_POS_MAX)) {
+		if ((e.getType() >= InputEvent.touchIndexLowerLimit)
+				&& (e.getType() <= InputEvent.touchIndexUpperLimit)) {
 			if ((containsRelative(relativePosition) || shifting || resizing
 					|| rotating || scaling)
 					&& !wasCatchedAbove) {
 
 				switch (e.getType()) {
-				case (InputEvent.TYPE_CLICK_POS):
-					isCatchedByMe = posClicked(e);
+				case (InputEvent.TYPE_TOUCH_CLICKED):
+					isCatchedByMe = touchClick(e);
 					break;
-				case (InputEvent.TYPE_RELEASE_POS):
-					isCatchedByMe = posReleased(e);
+				case (InputEvent.TYPE_TOUCH_UP):
+					isCatchedByMe = touchUp(e);
 					break;
-				case (InputEvent.TYPE_PRESS_POS):
-					isCatchedByMe = posPressed(e);
+				case (InputEvent.TYPE_TOUCH_DOWN):
+					isCatchedByMe = touchDown(e);
 					break;
-				case (InputEvent.TYPE_DRAG_POS):
-					isCatchedByMe = posDragged(e);
+				case (InputEvent.TYPE_TOUCH_DRAGGED):
+					isCatchedByMe = touchDrag(e);
 					break;
 				}
 			} else {
@@ -304,17 +306,17 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 				if (!containsRelative(relativePosition)) {
 
 					switch (e.getType()) {
-					case (InputEvent.TYPE_CLICK_POS):
-						isCatchedByMe = posClickedOutside(e);
+					case (InputEvent.TYPE_TOUCH_CLICKED):
+						isCatchedByMe = touchClickOutside(e);
 						break;
-					case (InputEvent.TYPE_RELEASE_POS):
-						isCatchedByMe = posReleasedOutside(e);
+					case (InputEvent.TYPE_TOUCH_UP):
+						isCatchedByMe = touchUpOutside(e);
 						break;
-					case (InputEvent.TYPE_PRESS_POS):
-						isCatchedByMe = posPressedOutside(e);
+					case (InputEvent.TYPE_TOUCH_DOWN):
+						isCatchedByMe = touchDownOutside(e);
 						break;
-					case (InputEvent.TYPE_DRAG_POS):
-						isCatchedByMe = posDraggedOutside(e);
+					case (InputEvent.TYPE_TOUCH_DRAGGED):
+						isCatchedByMe = touchDragOutside(e);
 						break;
 					}
 				}
@@ -426,7 +428,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	}
 
-	public boolean posClicked(final InputEvent e) {
+	public boolean touchClick(final InputEvent e) {
 
 		stopShifting();
 		stopRotating();
@@ -448,7 +450,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	}
 
-	protected boolean posClickedOutside(final InputEvent e) {
+	protected boolean touchClickOutside(final InputEvent e) {
 
 		stopShifting();
 		stopRotating();
@@ -456,7 +458,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		return false;
 	}
 
-	public boolean posDragged(final InputEvent e) {
+	public boolean touchDrag(final InputEvent e) {
 
 		updateShifting(e);
 		updateRotating(e);
@@ -466,18 +468,18 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	}
 
-	protected boolean posDraggedOutside(final InputEvent e) {
+	protected boolean touchDragOutside(final InputEvent e) {
 		return false;
 	}
 
-	public boolean posEntered(final InputEvent e) {
+	public boolean touchEnter(final InputEvent e) {
 
 		updateShifting(e);
 		return true;
 
 	}
 
-	public boolean posExited(final InputEvent e) {
+	public boolean touchExit(final InputEvent e) {
 
 		if (shifting && (shiftGrid.get() > 0)
 				&& abilities.contains(BasicInteractable.MODE_SHIFT, false)) {
@@ -494,13 +496,13 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	}
 
-	public boolean posMoved(final InputEvent e) {
+	public boolean touchMove(final InputEvent e) {
 
 		return true;
 
 	}
 
-	public boolean posPressed(final InputEvent e) {
+	public boolean touchDown(final InputEvent e) {
 
 		if (abilities.getSize() > 0) {
 			selected = true;
@@ -516,7 +518,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	}
 
-	protected boolean posPressedOutside(final InputEvent e) {
+	protected boolean touchDownOutside(final InputEvent e) {
 		if ((mode == BasicInteractable.MODE_RESIZE) && (resizeGrid.get() > 0)
 				&& abilities.contains(BasicInteractable.MODE_RESIZE, false)
 				&& getTouchResizingArea(relativePosition) != ResizingPoint.NONE) {
@@ -528,7 +530,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		return false;
 	}
 
-	public boolean posReleased(final InputEvent e) {
+	public boolean touchUp(final InputEvent e) {
 
 		if (shifting && (shiftGrid.get() > 0)
 				&& abilities.contains(BasicInteractable.MODE_SHIFT, false)) {
@@ -554,11 +556,11 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	}
 
-	protected boolean posReleasedOutside(final InputEvent e) {
+	protected boolean touchUpOutside(final InputEvent e) {
 		return false;
 	}
 
-	public boolean posZoom(final InputEvent e) {
+	public boolean scroll(final InputEvent e) {
 
 		return true;
 
@@ -833,6 +835,11 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 		updateTransform(this, angle.get(), scale.get());
 	}
+	
+	protected void updateTransformWithoutPosition() {
+
+		updateTransform(new Rectangle(0, 0, width, height), angle.get(), scale.get());
+	}
 
 	protected void updateTransform(Rectangle r, int angle, float scale) {
 
@@ -854,21 +861,41 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 			float dX = (lastRelativeInputPosition.x - relativePosition.x);
 			float dY = (lastRelativeInputPosition.y - relativePosition.y);
-
 			if (resizeArea == ResizingPoint.LowerLeft) {
+				resizeOldOppositePosition.set(transformRelativePointToPoint(width, height));
 				setSize(width + dX, height + dY);
-				setPosition(x - dX, y - dY);
+				updateTransform();
+				resizeNewOppositePosition.set(transformRelativePointToPoint(width, height));
+				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				setPosition(x - dsX, y - dsY);
 			}
 			if (resizeArea == ResizingPoint.LowerRight) {
+				resizeOldOppositePosition.set(transformRelativePointToPoint(0, height));
 				setSize(width - dX, height + dY);
-				setPosition(x, y - dY);
+				updateTransform();
+				resizeNewOppositePosition.set(transformRelativePointToPoint(0, height));
+				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				setPosition(x - dsX, y - dsY);
 			}
 			if (resizeArea == ResizingPoint.UpperLeft) {
+				resizeOldOppositePosition.set(transformRelativePointToPoint(width, 0));
 				setSize(width + dX, height - dY);
-				setPosition(x - dX, y);
+				updateTransform();
+				resizeNewOppositePosition.set(transformRelativePointToPoint(width, 0));
+				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				setPosition(x - dsX, y - dsY);
 			}
 			if (resizeArea == ResizingPoint.UpperRight) {
+				resizeOldOppositePosition.set(transformRelativePointToPoint(0, 0));
 				setSize(width - dX, height - dY);
+				updateTransform();
+				resizeNewOppositePosition.set(transformRelativePointToPoint(0, 0));
+				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				setPosition(x - dsX, y - dsY);
 			}
 			updateTransform();
 			relativePosition.set(transformPointToRelativePoint(e.getPosition()));

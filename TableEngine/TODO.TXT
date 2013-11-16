@@ -15,10 +15,10 @@ TODO:
  - BasicDefaultLanguage sortieren
  - Objekt-Klassen auslagern
  - ALLE KLASSEN ÖKONOMISIEREN (wiederverwendete Klassen nicht jedesmal neu erstellen sondern nur signifikante Werte zuweisen)
- - Input an LibGdx namentlich angleichen.
- - BasicObject in BasicInteractable aufteilen
- - BasicObject AffineTransform Shift einbauen!!!
  DONE:
+  - Input an LibGdx namentlich angleichen.
+ - BasicObject AffineTransform Shift einbauen!!!
+ - BasicObject in BasicInteractable aufteilen
  - Scale-Fähigkeit des BasicSynchronizable reparieren
  - Access an die Universe class angleichen: parentUniverse statt getParentLayer().getParentUniverse()
  - Verschiedene Auflösungen einbauen.

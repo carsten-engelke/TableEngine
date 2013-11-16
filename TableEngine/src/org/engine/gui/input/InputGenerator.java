@@ -98,7 +98,7 @@ public class InputGenerator extends GestureDetector {
 	@Override
 	public boolean mouseMoved(final int screenX, final int screenY) {
 		super.mouseMoved(screenX, screenY);
-		t.input(new InputEvent(InputEvent.TYPE_MOVE_POS, screenX,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_MOVED, screenX,
 				Gdx.graphics.getHeight() - screenY, false));
 		return true;
 	}
@@ -112,7 +112,7 @@ public class InputGenerator extends GestureDetector {
 		} else {
 			zoom = zoom * 2;
 		}
-		t.input(new InputEvent(InputEvent.TYPE_ZOOM, Gdx.input
+		t.input(new InputEvent(InputEvent.TYPE_SCROLLED, Gdx.input
 				.getX(0), Gdx.graphics.getHeight() - Gdx.input.getY(0), zoom));
 		return true;
 	}
@@ -124,7 +124,7 @@ public class InputGenerator extends GestureDetector {
 		if (button != 0) {
 			alt = true;
 		}
-		t.input(new InputEvent(InputEvent.TYPE_PRESS_POS, x,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_DOWN, x,
 				Gdx.graphics.getHeight() - y, alt));
 		return true;
 	}
@@ -132,7 +132,7 @@ public class InputGenerator extends GestureDetector {
 	@Override
 	public boolean touchDragged(final float x, final float y, final int pointer) {
 		super.touchDragged(x, y, pointer);
-		t.input(new InputEvent(InputEvent.TYPE_DRAG_POS, x,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_DRAGGED, x,
 				Gdx.graphics.getHeight() - y, false));
 		return true;
 	}
@@ -144,7 +144,7 @@ public class InputGenerator extends GestureDetector {
 		if (button != 0) {
 			alt = true;
 		}
-		t.input(new InputEvent(InputEvent.TYPE_RELEASE_POS, x,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_UP, x,
 				Gdx.graphics.getHeight() - y, alt));
 		return true;
 	}
@@ -166,11 +166,11 @@ class TESender implements GestureListener {
 
 	@Override
 	public boolean longPress(final float x, final float y) {
-		t.input(new InputEvent(InputEvent.TYPE_RELEASE_POS, x, y,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_DOWN, x, y,
 				true));
-		t.input(new InputEvent(InputEvent.TYPE_RELEASE_POS, x, y,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_UP, x, y,
 				false));
-		t.input(new InputEvent(InputEvent.TYPE_CLICK_POS, x, y,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_CLICKED, x, y,
 				true));
 		return true;
 	}
@@ -195,7 +195,7 @@ class TESender implements GestureListener {
 		if (button != 0) {
 			alt = true;
 		}
-		t.input(new InputEvent(InputEvent.TYPE_CLICK_POS, x,
+		t.input(new InputEvent(InputEvent.TYPE_TOUCH_CLICKED, x,
 				Gdx.graphics.getHeight() - y, count, alt));
 
 		return false;
@@ -211,7 +211,7 @@ class TESender implements GestureListener {
 		final float midX = Math.abs(Gdx.input.getX(0) - Gdx.input.getX(1));
 		final float midY = Gdx.graphics.getHeight()
 				- Math.abs(Gdx.input.getY(0) - Gdx.input.getY(1));
-		t.input(new InputEvent(InputEvent.TYPE_ZOOM, midX, midY,
+		t.input(new InputEvent(InputEvent.TYPE_SCROLLED, midX, midY,
 				initialDistance / distance));
 		return false;
 	}

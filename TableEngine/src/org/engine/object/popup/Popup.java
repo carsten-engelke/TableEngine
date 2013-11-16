@@ -106,7 +106,7 @@ public class Popup extends BasicInteractable {
 	public boolean input(final InputEvent e, final boolean wasCatchedAbove) {
 
 		final boolean wasCatchedByMe = super.input(e, wasCatchedAbove);
-		if ((e.getType() == InputEvent.TYPE_CLICK_POS)
+		if ((e.getType() == InputEvent.TYPE_TOUCH_CLICKED)
 				&& !containsRelative(relativePosition)) {
 			mouseClickedOutside();
 		}
@@ -154,7 +154,7 @@ public class Popup extends BasicInteractable {
 	}
 
 	@Override
-	public boolean posClicked(final InputEvent e) {
+	public boolean touchClick(final InputEvent e) {
 
 		for (final Order o : orders) {
 			if (o.bounds.contains(e.getX(), e.getY())) {
@@ -162,11 +162,11 @@ public class Popup extends BasicInteractable {
 				slave.receiveOrder(o.order);
 			}
 		}
-		return super.posClicked(e);
+		return super.touchClick(e);
 	}
 
 	@Override
-	public boolean posDragged(final InputEvent e) {
+	public boolean touchDrag(final InputEvent e) {
 
 		if (isSelected) {
 
@@ -175,37 +175,37 @@ public class Popup extends BasicInteractable {
 
 		} else {
 
-			return super.posDragged(e);
+			return super.touchDrag(e);
 
 		}
 	}
 
 	@Override
-	public boolean posEntered(final InputEvent e) {
+	public boolean touchEnter(final InputEvent e) {
 
 		checkOver(e);
-		return super.posEntered(e);
+		return super.touchEnter(e);
 	}
 
 	@Override
-	public boolean posExited(final InputEvent e) {
+	public boolean touchExit(final InputEvent e) {
 
 		for (final Order o : orders) {
 			o.over = false;
 			o.down = false;
 		}
-		return super.posExited(e);
+		return super.touchExit(e);
 	}
 
 	@Override
-	public boolean posMoved(final InputEvent e) {
+	public boolean touchMove(final InputEvent e) {
 
 		checkOver(e);
-		return super.posMoved(e);
+		return super.touchMove(e);
 	}
 
 	@Override
-	public boolean posPressed(final InputEvent e) {
+	public boolean touchDown(final InputEvent e) {
 
 		checkDown(e);
 		isSelected = true;
@@ -213,15 +213,15 @@ public class Popup extends BasicInteractable {
 	}
 
 	@Override
-	public boolean posReleased(final InputEvent e) {
+	public boolean touchUp(final InputEvent e) {
 
 		if (isSelected) {
 
-			return posClicked(e);
+			return touchClick(e);
 
 		} else {
 
-			return super.posReleased(e);
+			return super.touchUp(e);
 
 		}
 	}

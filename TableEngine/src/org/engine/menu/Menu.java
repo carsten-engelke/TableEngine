@@ -224,7 +224,7 @@ public class Menu extends Rectangle implements Interactable, Skinnable {
 
 		if (contains(e.getX(), e.getY())) {
 
-			if (e.getType() == InputEvent.TYPE_MOVE_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_MOVED) {
 
 				isOver[0] = true;
 				isDown[0] = false;
@@ -233,7 +233,7 @@ public class Menu extends Rectangle implements Interactable, Skinnable {
 				}
 
 			}
-			if (e.getType() == InputEvent.TYPE_DRAG_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_DRAGGED) {
 
 				if (isPressing) {
 					isDown[0] = true;
@@ -242,7 +242,7 @@ public class Menu extends Rectangle implements Interactable, Skinnable {
 					}
 				}
 			}
-			if (e.getType() == InputEvent.TYPE_CLICK_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_CLICKED) {
 
 				if (!showButtons) {
 					showButtons(true);
@@ -251,7 +251,7 @@ public class Menu extends Rectangle implements Interactable, Skinnable {
 				}
 				return true;
 			}
-			if (e.getType() == InputEvent.TYPE_PRESS_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_DOWN) {
 
 				isOver[0] = false;
 				isDown[0] = true;
@@ -260,7 +260,7 @@ public class Menu extends Rectangle implements Interactable, Skinnable {
 					isPressing = true;
 				}
 			}
-			if (e.getType() == InputEvent.TYPE_RELEASE_POS) {
+			if (e.getType() == InputEvent.TYPE_TOUCH_UP) {
 
 				isOver[0] = false;
 				isOver[1] = false;
@@ -271,8 +271,8 @@ public class Menu extends Rectangle implements Interactable, Skinnable {
 			}
 			return true;
 		} else {
-			if ((e.getType() >= InputEvent.TYPE_POS_MIN)
-					&& (e.getType() <= InputEvent.TYPE_POS_MAX)) {
+			if ((e.getType() >= InputEvent.touchIndexLowerLimit)
+					&& (e.getType() <= InputEvent.touchIndexUpperLimit)) {
 				isOver[0] = false;
 				isOver[1] = false;
 				isOver[2] = false;
@@ -280,7 +280,7 @@ public class Menu extends Rectangle implements Interactable, Skinnable {
 				isDown[1] = false;
 				isDown[2] = false;
 			}
-			if ((e.getType() == InputEvent.TYPE_CLICK_POS)
+			if ((e.getType() == InputEvent.TYPE_TOUCH_CLICKED)
 					&& (e.getTap_Amount() > 1)) {
 
 				showButtons(false);

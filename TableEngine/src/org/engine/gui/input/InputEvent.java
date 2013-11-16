@@ -1,7 +1,8 @@
 package org.engine.gui.input;
 
-import com.badlogic.gdx.Gdx;
 import org.engine.geometry.Vector2;
+
+import com.badlogic.gdx.Gdx;
 
 public class InputEvent {
 
@@ -16,22 +17,23 @@ public class InputEvent {
 	public static final char KEY_ESCAPE = 0x001B;
 	public static final float POSITION_UNDEFINED = -9876.54321F;
 
-	public static final short TYPE_CLICK_POS = 1;
+	public static final short TYPE_UNDEFINED = 0;
+	
+	public static final short touchIndexLowerLimit= 1;
+	public static final short TYPE_TOUCH_CLICKED = 1;
+	public static final short TYPE_TOUCH_DOWN= 3;
+	public static final short TYPE_TOUCH_UP = 4;
+	public static final short TYPE_TOUCH_MOVED = 5;
+	public static final short TYPE_TOUCH_DRAGGED = 6;
+	public static final short touchIndexUpperLimit = 6;
 
-	public static final short TYPE_DRAG_POS = 6;
-	public static final short TYPE_DRAG_SCREEN_POS = 11;
+//	public static final short TYPE_DRAG_SCREEN_POS = 11;
 	public static final short TYPE_INPUT_CHAR = 8;
 	public static final short TYPE_INPUT_KEY = 14;
-	public static final short TYPE_MARK_ON_SCREEN = 13;
+//	public static final short TYPE_MARK_ON_SCREEN = 13;
 
-	public static final short TYPE_MOVE_POS = 5;
-
-	public static final short TYPE_POS_MAX = 6;
-	public static final short TYPE_POS_MIN = 1;
-	public static final short TYPE_PRESS_POS = 3;
-	public static final short TYPE_RELEASE_POS = 4;
-	public static final short TYPE_ROTATE_SCREEN_RAD = 12;
-	public static final short TYPE_ZOOM = 9;
+//	public static final short TYPE_ROTATE_SCREEN_RAD = 12;
+	public static final short TYPE_SCROLLED = 9;
 	// character input events
 	private char character;
 	private float height;
@@ -41,7 +43,6 @@ public class InputEvent {
 
 	private int tap_amount;
 	private short type;
-	public final short TYPE_UNDEFINED = 0;
 	private float width;
 
 	private float width_on_screen;
@@ -118,7 +119,7 @@ public class InputEvent {
 			final boolean alternative) {
 
 		setToUndefined();
-		this.type = InputEvent.TYPE_CLICK_POS;
+		this.type = InputEvent.TYPE_TOUCH_CLICKED;
 		this.x_on_screen = x_on_screen;
 		this.y_on_screen = y_on_screen;
 		x = x_on_screen;
@@ -253,8 +254,8 @@ public class InputEvent {
 	}
 
 	public void setType(final short type) {
-		if ((type >= InputEvent.TYPE_POS_MIN)
-				&& (type <= InputEvent.TYPE_POS_MAX)) {
+		if ((type >= InputEvent.touchIndexLowerLimit)
+				&& (type <= InputEvent.touchIndexUpperLimit)) {
 			this.type = type;
 		}
 	}

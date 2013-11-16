@@ -9,8 +9,6 @@ import org.engine.gui.output.Graphics;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 public interface Interactable {
-
-	float START_Z_VALUE = 10000;
 	
 	public boolean isColliding(Vector2 point);
 	
