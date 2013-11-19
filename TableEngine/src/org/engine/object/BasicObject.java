@@ -2,19 +2,33 @@ package org.engine.object;
 
 import org.engine.Layer;
 import org.engine.Synchronizable;
+import org.engine.geometry.Rectangle;
 import org.engine.property.Information;
 import org.engine.property.InformationArrayStringException;
 import org.engine.property.Property;
 import org.engine.utils.Array;
 
-public class BasicObject extends BasicInteractable implements Object, Synchronizable{
+public class BasicObject extends BasicInteractable implements Object,
+		Synchronizable {
 
 	/**
-	 * 1 : Basic Drag n Drop
-	 * 2 : Synchronization
-	 * 3 : Affine Transform added
+	 * 1 : Basic Drag n Drop 2 : Synchronization 3 : Affine Transform added
 	 */
 	private static final long serialVersionUID = 3L;
+
+	private Property<?>[] rigidProperties = new Property<?>[] { metrics, z,
+			shiftGrid, resizeGrid, angle, rotateGrid, scale, scaleGrid };
+	protected Array<Property<?>> propertyArray = new Array<Property<?>>();
+
+	public BasicObject() {
+
+		super();
+	}
+
+	public BasicObject(Rectangle rectangle, int shiftGrid, int angle,
+			int rotateGrid) {
+		super(rectangle, shiftGrid, angle, rotateGrid);
+	}
 
 	@Override
 	public void setPropertiesFromInformation(final Array<Information> a) {
@@ -31,25 +45,23 @@ public class BasicObject extends BasicInteractable implements Object, Synchroniz
 
 	public Array<Property<?>> getProperties() {
 
-		Array<Property<?>> ap = new Array<Property<?>>(new Property<?>[] {
-				metrics, z, shiftGrid, resizeGrid, rotateGrid, angle, scale });
-		return ap;
+		propertyArray.clear();
+		propertyArray.addAll(rigidProperties);
+		return propertyArray;
 
 	}
 
 	@Override
 	public Array<Property<?>> getPropertiesFlagged() {
 
-		Property<?>[] props = new Property<?>[] { metrics, z, shiftGrid,
-				resizeGrid, rotateGrid, angle, scale };
-		Array<Property<?>> retProps = new Array<Property<?>>(props.length);
-		for (Property<?> p : props) {
+		propertyArray.clear();
+		for (Property<?> p : rigidProperties) {
 			if (p.flag() != Property.Flag.NONE) {
-				retProps.add(p);
+				propertyArray.add(p);
 			}
 		}
-		if (retProps.getSize() > 0) {
-			return retProps;
+		if (propertyArray.getSize() > 0) {
+			return propertyArray;
 		}
 		return null;
 	}
@@ -57,9 +69,16 @@ public class BasicObject extends BasicInteractable implements Object, Synchroniz
 	@Override
 	public Flag flag() {
 
+		if (i.flag == Flag.NONE) {
+			for (Property<?> p : getProperties()) {
+				if (p.flag() != Flag.NONE) {
+					i.flag = Flag.UPDATE;
+				}
+			}
+		}
 		return i.flag;
 	}
-	
+
 	@Override
 	public Information info() {
 
@@ -107,7 +126,57 @@ public class BasicObject extends BasicInteractable implements Object, Synchroniz
 	@Override
 	public void setFlag(Flag f) {
 
+		for (Property<?> p : getProperties()) {
+			p.setFlag(f);
+		}
 		i.flag = f;
 	}
 
+	@Override
+	protected void stopResizing() {
+
+		super.stopResizing();
+		t.addAnimation(i.id + ":resize(" + resizeStartSize.x + ":"
+				+ resizeStartSize.y + ":" + width + ":" + height + ":"
+				+ dragStartPoint.x + ":" + dragStartPoint.y + ":" + x + ":" + y
+				+ ")");
+		metrics.setFlag(Flag.UPDATE);
+	}
+
+	@Override
+	protected void stopScaling() {
+
+		super.stopScaling();
+		t.addAnimation(i.id + ":scale(" + startScale + ":" + scale.get() + ")");
+		scale.setFlag(Flag.UPDATE);
+	}
+
+	@Override
+	protected void stopRotating() {
+
+		super.stopRotating();
+		t.addAnimation(i.id + ":rotate(" + rotateStartAngle + ":" + angle + ")");
+		angle.setFlag(Flag.UPDATE);
+	}
+
+	@Override
+	protected void stopShifting() {
+
+		super.stopShifting();
+		t.addAnimation(i.id + ":shift(" + dragStartPoint.x + ":"
+				+ dragStartPoint.y + ":" + getX() + ":" + getY() + ")");
+		metrics.setFlag(Flag.UPDATE);
+		z.setFlag(Flag.UPDATE);
+	}
+
+	@Override
+	public Information infoFlagOnly() {
+		
+		propertyArray = getPropertiesFlagged();
+		if (propertyArray != null && propertyArray.getSize() > 0) {
+			i.content = Information.PropertiesToString(propertyArray);
+			return i;
+		}
+		return null;
+	}
 }

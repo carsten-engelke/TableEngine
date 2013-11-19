@@ -42,7 +42,10 @@ public class DebugWindow {
 	private Text text_5;
 	private Text text_6;
 	private Text textContent;
-	private Text text;
+	private Text textTest1;
+	private Text txtCompleteProp;
+	private Text txtFlaggedProp;
+	private Text txtPropResult;
 
 	/**
 	 * Launch the application.
@@ -50,12 +53,13 @@ public class DebugWindow {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		try {
-			DebugWindow window = new DebugWindow();
-			window.open();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		// try {
+		// DebugWindow window = new DebugWindow();
+		// window.open();
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		TableEngine.main(args);
 	}
 
 	public DebugWindow() {
@@ -93,7 +97,7 @@ public class DebugWindow {
 		shlDebug.setSize(640, 480);
 		shlDebug.setText("Debug");
 		shlDebug.setLayout(new FillLayout(SWT.HORIZONTAL));
-		
+
 		new TestClass().execute();
 
 		Menu menu = new Menu(shlDebug, SWT.BAR);
@@ -191,13 +195,14 @@ public class DebugWindow {
 
 		MenuItem mntmManualmode = new MenuItem(menu_3, SWT.RADIO);
 		mntmManualmode.setText("MANUAL_MODE");
-		
+
 		final MenuItem mntmDebugMode = new MenuItem(menu_1, SWT.CHECK);
 		mntmDebugMode.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (engine != null) {
-					engine.preferences.putBoolean("debug", mntmDebugMode.getSelection());
+					engine.preferences.putBoolean("debug",
+							mntmDebugMode.getSelection());
 				}
 			}
 		});
@@ -233,13 +238,15 @@ public class DebugWindow {
 				| SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		textSettings.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,
 				2, 1));
-		
+
 		Button btnAddAnimation = new Button(grpSettings, SWT.NONE);
-		btnAddAnimation.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+		btnAddAnimation.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
+				false, 1, 1));
 		btnAddAnimation.setText("Add Animation");
-		
+
 		Button btnAddPlayer = new Button(grpSettings, SWT.NONE);
-		btnAddPlayer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		btnAddPlayer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 1, 1));
 		btnAddPlayer.setText("Add Player");
 
 		Group grpContent = new Group(sashForm, SWT.NONE);
@@ -384,37 +391,43 @@ public class DebugWindow {
 		text_6 = new Text(composite, SWT.BORDER | SWT.READ_ONLY | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.CANCEL | SWT.MULTI);
 		text_6.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 4, 1));
-		
+
 		TabItem tbtmTest = new TabItem(tabFolder, SWT.NONE);
 		tbtmTest.setText("Test");
-		
+
 		Composite composite_1 = new Composite(tabFolder, SWT.NONE);
 		tbtmTest.setControl(composite_1);
 		composite_1.setLayout(new GridLayout(3, false));
-		
+
 		Button btnNewButton = new Button(composite_1, SWT.NONE);
+		btnNewButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
+				false, 1, 1));
 		btnNewButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				Information i = new Information("ID", "TAG", Flag.ADD_CHANGE, "CONTENT");
-				Information i2 = new Information("ID2", "TAG", Flag.REMOVE, "CONTENT2");
+				Information i = new Information("ID", "TAG", Flag.UPDATE,
+						"CONTENT");
+				Information i2 = new Information("ID2", "TAG", Flag.REMOVE,
+						"CONTENT2");
 				Array<Information> ai = new Array<Information>();
 				ai.add(i);
 				ai.add(i2);
-				text.setText(Information.InformationsToString(ai));
+				textTest1.setText(Information.InformationsToString(ai));
 			}
 		});
 		btnNewButton.setText("Create StringFromInfos");
-		
-		text = new Text(composite_1, SWT.BORDER);
-		text.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-		
+
+		textTest1 = new Text(composite_1, SWT.BORDER);
+		textTest1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
+				1, 1));
+
 		Button btnCreateInfoFrom = new Button(composite_1, SWT.NONE);
 		btnCreateInfoFrom.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				try {
-					Array<Information> i = Information.StringToInformations(text.getText());
+					Array<Information> i = Information
+							.StringToInformations(textTest1.getText());
 					System.out.println("SUCCESS: " + i.toString());
 				} catch (InformationArrayStringException e1) {
 					e1.printStackTrace();
@@ -423,6 +436,275 @@ public class DebugWindow {
 		});
 		btnCreateInfoFrom.setText("Create Info from String");
 
+		Button btnLoadCompletePropstring = new Button(composite_1, SWT.NONE);
+		btnLoadCompletePropstring.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (engine != null) {
+					txtCompleteProp.setText(Information
+							.PropertiesToString(engine.getProperties()));
+				}
+			}
+		});
+		btnLoadCompletePropstring.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, false, false, 1, 1));
+		btnLoadCompletePropstring.setText("Load Complete PropString");
+
+		txtCompleteProp = new Text(composite_1, SWT.BORDER);
+		txtCompleteProp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 2, 1));
+
+		Button btnLoadFlaggedPropstring = new Button(composite_1, SWT.NONE);
+		btnLoadFlaggedPropstring.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (engine != null) {
+					txtFlaggedProp.setText(Information
+							.PropertiesToStringFlagOnly(engine
+									.getPropertiesFlagged()));
+				}
+			}
+		});
+		btnLoadFlaggedPropstring.setLayoutData(new GridData(SWT.FILL,
+				SWT.CENTER, false, false, 1, 1));
+		btnLoadFlaggedPropstring.setText("Load Flagged PropString");
+
+		txtFlaggedProp = new Text(composite_1, SWT.BORDER);
+		txtFlaggedProp.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+				false, 2, 1));
+		new Label(composite_1, SWT.NONE);
+
+		Button btnTryToInclude = new Button(composite_1, SWT.NONE);
+		btnTryToInclude.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				include(txtFlaggedProp.getText(), txtCompleteProp.getText());
+			}
+		});
+		btnTryToInclude.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER,
+				false, false, 1, 1));
+		btnTryToInclude.setText("Try to include");
+		new Label(composite_1, SWT.NONE);
+
+		txtPropResult = new Text(composite_1, SWT.BORDER | SWT.WRAP | SWT.MULTI);
+		txtPropResult.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+				true, 3, 1));
+
+	}
+
+	protected void include(String flagString, String completeString) {
+
+		// txtPropResult.setText(flagString + " -> " + completeString);
+
+		stringToOrders(new Array<Level>(), flagString, completeString);
+	}
+
+	protected void stringToOrders(Array<Level> IDchain, String flagString,
+			String completeString) {
+
+		String tag = flagString.substring(flagString.indexOf("<") + 1,
+				flagString.indexOf(">"));
+		String start = "<" + tag + ">";
+		String sep = "<:" + tag + "<>";
+		String end = "</" + tag + ">";
+
+		String block = flagString.substring(flagString.indexOf(start),
+				flagString.indexOf(end));
+		// txtPropResult.append("\n" + block);
+		for (String prop : block.split(start)) {
+			if (prop != null && prop.contains(sep)) {
+				String id = prop.substring(0, prop.indexOf(sep));
+				String flag = prop.substring(prop.indexOf(sep) + sep.length(),
+						prop.indexOf(">", prop.indexOf(sep) + sep.length()));
+				String content = prop
+						.substring(
+								prop.indexOf(">",
+										prop.indexOf(sep) + sep.length()) + 1,
+								prop.length());
+				// txtPropResult.append("\nID:" + id + ", FLAG:" + flag +
+				// ", CONTENT:" + content);
+				if (flag.equals("+")) {
+					if (content.startsWith("<")) {
+						// contains SUB-PROPERTIES
+						// txtPropResult.append("\n" + id + " has sub:" +
+						// content);
+						Array<Level> n = new Array<Level>(IDchain);
+						n.add(new Level(id, tag));
+						stringToOrders(n, content, completeString);
+					} else {
+						// IDchain += tag + "," + id;
+						Array<Level> n = new Array<Level>(IDchain);
+						n.add(new Level(id, tag));
+						txtPropResult.append("\n" + n + " has no sub:"
+								+ content + " -> apply it!!!");
+						updateProp(n, content, completeString);
+					}
+				}
+				if (flag.equals("-")) {
+					Array<Level> n = new Array<Level>(IDchain);
+					n.add(new Level(id, tag));
+					removeProp(n, completeString);
+				}
+			}
+		}
+	}
+
+	class Level {
+
+		public String id;
+		public String tag;
+
+		public Level(String id, String tag) {
+
+			this.id = id;
+			this.tag = tag;
+		}
+
+		@Override
+		public String toString() {
+
+			return tag + "<>" + id;
+		}
+	}
+
+	private void removeProp(Array<Level> iDchain, String completeString) {
+
+		System.out.println("RESULT:" + remove(iDchain, "", "", completeString));
+	}
+
+	private String remove(Array<Level> la, String before, String after,
+			String content) {
+
+		System.out.println("   REMOVE: " + la + ", C:" + content + ", B:"
+				+ before + ", A:" + after);
+		Level l = la.first();
+		String start = "<" + l.tag + ">";
+		String sep = "<:" + l.tag + "<>";
+		String flag = "0>";
+		String end = "</" + l.tag + ">";
+
+		if (content.contains(start)) {
+
+			before += content.substring(0, content.indexOf(start));
+			String block = content.substring(content.indexOf(start),
+					content.indexOf(end));
+			after = content.substring(content.indexOf(end)) + after;
+			boolean found = false;
+			String inbetween = "";
+			for (String prop : block.split(start)) {
+
+				if (prop != null && prop.contains("<")) {
+					if (!found) {
+						String id = prop.substring(0, prop.indexOf("<"));
+						if (id.equals(l.id)) {
+							found = true;
+							content = prop.substring(prop.indexOf(flag)
+									+ flag.length());
+						} else {
+							before += start + prop;
+						}
+					} else {
+						inbetween += start + prop;
+					}
+				}
+			}
+			if (found) {
+				if (la.getSize() > 1) {
+					before += start + l.id + sep + flag;
+					after = inbetween + after;
+					la.removeIndex(0);
+					return remove(la, before, after, content);
+				} else {
+					return before + inbetween + after;
+				}
+			} else {
+				return before + content + after;
+			}
+		} else {
+			return before + content + after;
+		}
+	}
+
+	private void updateProp(Array<Level> iDchain, String newContent,
+			String completeString) {
+
+		System.out.println("RESULT: "
+				+ update(iDchain, completeString, "", "", newContent));
+	}
+
+	private String update(Array<Level> la, String content, String before,
+			String after, String newContent) {
+
+		System.out.println("   UPDATE: " + la + ", C:" + content + ", B:"
+				+ before + ", A:" + after + ", N:" + newContent);
+		Level l = la.first();
+		String start = "<" + l.tag + ">";
+		String sep = "<:" + l.tag + "<>";
+		String flag = "0>";
+		String end = "</" + l.tag + ">";
+
+		if (content.contains(start)) {
+
+			before += content.substring(0, content.indexOf(start));
+			String block = content.substring(content.indexOf(start),
+					content.indexOf(end));
+			after = content.substring(content.indexOf(end)) + after;
+			boolean found = false;
+			String inbetween = "";
+			for (String prop : block.split(start)) {
+				if (prop != null && prop.contains("<")) {
+					if (!found) {
+						String id = prop.substring(0, prop.indexOf("<"));
+						if (id.equals(l.id)) {
+							found = true;
+							content = prop.substring(prop.indexOf(flag)
+									+ flag.length());
+						} else {
+							before += start + prop;
+						}
+					} else {
+						inbetween += start + prop;
+					}
+				}
+			}
+			if (!found) {
+				// ID NOT FOUND -> Insert newContent nested into remaining
+				// levels
+				la.removeIndex(0);
+				String insertbefore = "";
+				String insertafter = "";
+				for (Level lev : la) {
+					insertbefore += "<" + lev.tag + ">" + lev.id + "<:"
+							+ lev.tag + "<>0>";
+					insertafter = "</" + lev.tag + ">" + insertafter;
+				}
+				return before + insertbefore + content + insertafter + after;
+			} else {
+				// ID found -> update content
+				if (la.getSize() > 1) { // still levels left
+					// look into content for next level
+					la.removeIndex(0); // level up
+					before += start + l.id + sep + flag;
+					after = inbetween + after;
+					return update(la, content, before, after, newContent);
+				} else {
+					// last level -> update content
+					System.out.println("       NEW CONTENT:" + newContent);
+					return before + start + l.id + sep + flag + newContent
+							+ inbetween + after;
+				}
+			}
+		} else { // TAG NOT FOUND -> Insert Content nested into remaining levels
+			String insertbefore = "";
+			String insertafter = "";
+			for (Level lev : la) {
+				insertbefore += "<" + lev.tag + ">" + lev.id + "<:" + lev.tag
+						+ "<>0>";
+				insertafter = "</" + lev.tag + ">" + insertafter;
+			}
+			return before + insertbefore + content + newContent + insertafter
+					+ after;
+		}
 	}
 
 	protected void showFlaggedContent() {
@@ -430,10 +712,15 @@ public class DebugWindow {
 		if (engine != null) {
 
 			textContent.setText("");
-			for (Information i : Information.PropertiesToInformations(engine
-					.getPropertiesFlagged())) {
-				textContent.append(Information.ReadableInfoString(i, 0));
+			Array<Information> in = Information
+					.PropertiesToInformationsFlagOnly(engine
+							.getPropertiesFlagged());
+			if (in != null) {
+				for (Information i : in) {
+					textContent.append(Information.ReadableInfoString(i, 0));
+				}
 			}
+
 		}
 	}
 

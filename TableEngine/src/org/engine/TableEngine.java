@@ -51,68 +51,78 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.TimeUtils;
 
+/**
+ * <code>TableEngine</code> is the main computing class. TableEngine is capable
+ * of showing objects in a 2D environment and manages interaction and
+ * synchronization via Internet of these. Therefore a system of
+ * String-convertible {@link Property Properties} is supervised by a network,
+ * that checks whether one of these has been flagged as changed. Consequently
+ * they are turned into Strings and uploaded to a <code>PHP-Server</code>. User
+ * IO is generally updated only on interaction, decreasing CPU usage.</br>
+ * 
+ * In order to write a game, <code>TableEngine</code> is to be extended and the
+ * {@link #loadGame()} method overwritten. It is recommended, that all game
+ * resources are packed into a {@link Resource} object, that is provided by the
+ * {@link TableEngineDefinition} from <code>loadGame()</code>.</br>
+ * 
+ * The actual entry point for the game will be the {@link Stage} provided by
+ * {@link TableEngineDefinition#getEntryStage()}.</br>
+ * 
+ * For more information about IO see {@link #input(InputEvent)} and
+ * {@link #output(Graphics)}.
+ * 
+ */
 public class TableEngine implements ApplicationListener, Synchronizable,
 		NetworkListener {
 
 	public static final boolean SHOW_UI = true;
-	public static final boolean SHOW_UNIVERSE = false;
+	public static final boolean SHOW_TABLE = false;
+	private boolean showUI = false;
 
+	// IO CLASSES
 	private OrthographicCamera camera;
 	private Graphics g;
+	private float savedHeight;
+	private float savedWidth;
 	private InputGenerator i;
 
+	// SKIN & STYLE CLASSES
 	public Skin uiSkin;
 	public String uiStyleName;
 
-	private float savedHeight;
-	private float savedWidth;
-
-	private boolean showUI = false;
-
+	// STAGES
 	private Stage ui;
 	public Stage settingsScreen = null;
 
+	// RESOURCES
 	private ArrayMap<String, Resource> resourceMap = new ArrayMap<String, Resource>();
 	private BasicResource basicResource;
 
+	// LAYERS
 	private Array<Layer> layerList = new Array<Layer>();
 	private Array<SyncProperty> syncLayerList = new Array<SyncProperty>();
 	private SortableLayerArray outputLayerList = new SortableLayerArray(
 			SortableLayerArray.COMPARE_DEPTH_HIGHEST_ABOVE);
 	private SortableLayerArray inputLayerList = new SortableLayerArray(
 			SortableLayerArray.COMPARE_DEPTH_HIGHEST_BELOW);
-	private LongProperty objID = new LongProperty("OBJID", TABLE_ENGINE_TAG, Flag.NONE, 0L);
-
-	public Preferences preferences;
-	public final static String PREFERENCES_LOCATION = "TableEngine";
-
-	public Array<String> debugOrderList = new Array<String>();
-//	public boolean debugMode = false;
-	private Language defLang;
-	private Language language;
-	public Network net;
-
 	public static final String OBJECT_LAYER = "OBJ";
 	public static final String POPUP_LAYER = "POP";
 	public static final String MENU_LAYER = "MENU";
 	public Menu menu = new Menu();
 
-	public static final String TABLE_ENGINE_TAG = "T";
-	public static final int ANIMATION_LIMIT = 5;
-	public static final int CHAT_LIMIT = 10;
-	public static final int PLAYER_LIMIT = 16;
+	// PREFERENCES
+	public Preferences preferences;
+	public final static String PREFERENCES_LOCATION = "TableEngine";
 
-	private StringArrayProperty animationList = new StringArrayProperty(
-			"ANIMATIONS", TABLE_ENGINE_TAG, Flag.NONE, new Array<String>(ANIMATION_LIMIT,
-					ANIMATION_LIMIT));
-	private Array<String> performedAnimations = new Array<String>();
-	public StringArrayProperty banList = new StringArrayProperty("BANS",
-			TABLE_ENGINE_TAG, Flag.NONE, new Array<String>());
-	public StringArrayProperty chatList = new StringArrayProperty("CHATS",
-			TABLE_ENGINE_TAG, Flag.NONE, new Array<String>(CHAT_LIMIT, CHAT_LIMIT));
-	private PlayerArrayProperty playerList = new PlayerArrayProperty("PLAYERS",
-			TABLE_ENGINE_TAG, Flag.NONE, new Array<Player>(PLAYER_LIMIT, PLAYER_LIMIT));
+	// DEBUG ORDERS
+	public Array<String> debugOrderList = new Array<String>();
 
+	// LANGUAGE
+	private Language defLang;
+	private Language language;
+
+	// NETWORK
+	public Network net;
 	private int waitingForSend = 0;
 	public static final int REQUEST_LOG_LIMIT = 10;
 	public Array<String> requestLog = new Array<String>(REQUEST_LOG_LIMIT,
@@ -123,6 +133,35 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	private boolean waitingForIncomingNetworkTraffic = false;
 	private long lastReceiveTimeStamp;
 
+	// RIGID PROPERTIES
+	public static final String TABLE_ENGINE_TAG = "T";
+	private LongProperty objID = new LongProperty("OBJID", TABLE_ENGINE_TAG,
+			Flag.NONE, 0L);
+	public static final int ANIMATION_LIMIT = 5;
+	public static final int CHAT_LIMIT = 10;
+	public static final int PLAYER_LIMIT = 16;
+	private StringArrayProperty animationList = new StringArrayProperty(
+			"ANIMATIONS", TABLE_ENGINE_TAG, Flag.NONE, new Array<String>(
+					ANIMATION_LIMIT, ANIMATION_LIMIT));
+	private Array<String> performedAnimations = new Array<String>();
+	public StringArrayProperty banList = new StringArrayProperty("BANS",
+			TABLE_ENGINE_TAG, Flag.NONE, new Array<String>());
+	public StringArrayProperty chatList = new StringArrayProperty("CHATS",
+			TABLE_ENGINE_TAG, Flag.NONE, new Array<String>(CHAT_LIMIT,
+					CHAT_LIMIT));
+	private PlayerArrayProperty playerList = new PlayerArrayProperty("PLAYERS",
+			TABLE_ENGINE_TAG, Flag.NONE, new Array<Player>(PLAYER_LIMIT,
+					PLAYER_LIMIT));
+	private Property[] rigidProperties = new Property[] { objID, animationList,
+			banList, chatList, playerList };
+	Array<Property<?>> propertyArray = new Array<Property<?>>(rigidProperties);
+	Array<Property<?>> flaggedPropertyArray = new Array<Property<?>>();
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.badlogic.gdx.ApplicationListener#create()
+	 */
 	@Override
 	public void create() {
 
@@ -139,15 +178,14 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		loadResources();
 
 		setUI(ui, SHOW_UI);
-		// ENTRY POINT FOR START SCREEN
-		// setUI(loadStartScreen(), SHOW_UI);
-
-		// GDX REMOTE
-		// RemoteInput ri = new RemoteInput();
-		// ri.setInputProcessor(i);
-		// setIO(false);
 	}
 
+	/**
+	 * Load resources. Called during {@link #create()} method. Initiates the
+	 * {@link TableEngineDefinition} provided by {@link #loadGame()}, loading
+	 * all {@link Resource Resources} and starting the game ({@link Stage} of
+	 * {@link TableEngineDefinition#getEntryStage()}.
+	 */
 	private void loadResources() {
 
 		// Load game from TableEngineDefinition class
@@ -155,12 +193,13 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		if (def != null) {
 			try {
 
-				// Add Basic resource
+				// Add basic resource -> contained in jar!
 				basicResource = new BasicResource();
 				resourceMap.put(BasicResource.DESCRIPTION_ID, basicResource);
 				basicResource.initialize(this);
 
-				// Add additional resources
+				// Add additional resources from TableEngineDefinition = game
+				// specific resources
 				if (def.getResourceData() != null) {
 
 					for (final Resource r : def.getResourceData()) {
@@ -173,6 +212,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 				// Load Settings
 				preferences = Gdx.app.getPreferences(PREFERENCES_LOCATION);
 				if (preferences.get().size() == 0) {
+
 					// No settings saved before, load default settings
 					for (Resource r : resourceMap.values()) {
 						preferences.put(r.getDefaultPreferences().get());
@@ -192,6 +232,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 					net = def.getNetwork();
 					net.initialize(this);
 				} else {
+					// initialize standard PHP-Server network
 					ServerNetwork snet = new ServerNetwork();
 					snet.initialize(this);
 					snet.url = getPrefString("url");
@@ -202,12 +243,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 					snet.playerPassword = getPrefString("playerPassword");
 					net = snet;
 				}
-				
-				// Load skin and style
+
+				// Load basic skin and style
 				Skin s = resourceMap.getValue(BasicResource.DESCRIPTION_ID)
 						.getSkin(BasicResource.DESCRIPTION_ID);
 				String sn = "default";
-				// If available overwrite with TableEngineDefinition
+				// If available overwrite with TableEngineDefinition = game skin
 				if (def.getUISkin() != null) {
 					s = def.getUISkin();
 				}
@@ -215,13 +256,14 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 					sn = def.getUIStyleName();
 				}
 				setStyle(s, sn);
-				
+
 				// Load Layers
-				// Add Basic Layers and initialize Menu
-				SyncLayer objectLayer = new SyncLayer(new TransformGUI(), OBJECT_LAYER,
-						-100, true);
+				// Add basic Layers and initialize Menu
+				SyncLayer objectLayer = new SyncLayer(new TransformGUI(),
+						OBJECT_LAYER, -100, true);
 				objectLayer.initialize(this);
-				syncLayerList.add(new SyncProperty(OBJECT_LAYER, TABLE_ENGINE_TAG, Flag.NONE, objectLayer));
+				syncLayerList.add(new SyncProperty(OBJECT_LAYER,
+						TABLE_ENGINE_TAG, Flag.NONE, objectLayer));
 				layerList.add(objectLayer);
 				Layer popupLayer = new Layer(new PlainGUI(), POPUP_LAYER, -90,
 						true);
@@ -233,24 +275,30 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 				layerList.add(menuLayer);
 				menuLayer.addInteractable(menu);
 				if (def.getMenuItems() != null) {
-					Array<MenuItem> mia = new Array<MenuItem>(def.getMenuItems());
+					Array<MenuItem> mia = new Array<MenuItem>(
+							def.getMenuItems());
 					menu.addMenuItems(mia);
 				}
+				// add additional Layers
 				if (def.getLayers() != null) {
 					for (Layer l : def.getLayers()) {
 						l.initialize(this);
 						layerList.add(l);
 						if (Synchronizable.class.isAssignableFrom(l.getClass())) {
 							syncLayerList.add(new SyncProperty(l.label.get(),
-									TABLE_ENGINE_TAG, Flag.NONE, (Synchronizable) l));
+									TABLE_ENGINE_TAG, Flag.NONE,
+									(Synchronizable) l));
 						}
 					}
 				}
+				// put Layers to differently sorted lists
 				outputLayerList.addAll(layerList);
 				inputLayerList.addAll(layerList);
+				for (SyncProperty sl : syncLayerList) {
+					propertyArray.add(sl);
+				}
 				objectLayer.addInteractable(new TestInteractable());
 				objectLayer.addInteractable(new TestInteractable());
-
 
 				// Load entry stage class if available
 				if (def.getEntryStage() != null) {
@@ -274,7 +322,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 								float x, float y) {
 
 							super.clicked(event, x, y);
-							switchUI(SHOW_UNIVERSE);
+							switchUI(SHOW_TABLE);
 						}
 					});
 					t.add(startUniverse).expandX().fill();
@@ -286,13 +334,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 				settingsScreen = def.getSettingsStage();
 				// Finally set style again for all the added Skinnable classes.
 				setStyle(s, sn);
-
 			} catch (Exception e) {
 
-				// If something went wrong load an empty Universe showing just
-				// an error message!
-				// main = new NullUniverse(this);
-				Gdx.app.log("EXCEPTION CAUGHT", e.getMessage());
+				Gdx.app.error("EXCEPTION CAUGHT DURING LOADING: ",
+						e.getMessage()
+								+ "\ni haven't a clue what i am doing... you"
+								+ "'re screwed, so utterly utterly screwed.");
 				e.printStackTrace();
 			}
 		}
@@ -300,6 +347,14 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 
 	}
 
+	/**
+	 * Sets the style.
+	 * 
+	 * @param uiSkin
+	 *            the ui skin
+	 * @param uiStyleName
+	 *            the ui style name
+	 */
 	private void setStyle(Skin uiSkin, String uiStyleName) {
 
 		this.uiSkin = uiSkin;
@@ -316,16 +371,31 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.badlogic.gdx.ApplicationListener#dispose()
+	 */
 	@Override
 	public void dispose() {
 		g.dispose();
 		ui.dispose();
 	}
 
+	/**
+	 * Gets the ui.
+	 * 
+	 * @return the ui
+	 */
 	public Stage getUI() {
 		return ui;
 	}
 
+	/**
+	 * Checks if is showing.
+	 * 
+	 * @return true, if is showing
+	 */
 	public boolean isShowing() {
 
 		return showUI;
@@ -334,20 +404,38 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	/**
 	 * To be overwritten by actual game. The returned TableEngineDefinition
 	 * class must provide the necessary resources and returns the programs entry
-	 * point {@link TableEngineDefinition}.
+	 * point {@link TableEngineDefinition}. Therefore this is the most important
+	 * and usually only interface to the game content.</br>
+	 * 
+	 * The intended way of writing a game is to extend {@link TableEngine} and
+	 * overwrite only this method by a <code>TableEngineDefinition</code>.
+	 * <code>TableEngine</code> will load the provided content (see
+	 * {@link #loadResources()}) and start by showing the Stage provided by
+	 * {@link TableEngineDefinition#getEntryStage()}.
 	 * 
 	 * @return the table engine definition
 	 */
 	protected TableEngineDefinition loadGame() {
-		
-		return TableEngineDefinition.DefaultTableEngineDefinition.getStandardDef();
+
+		return TableEngineDefinition.DefaultTableEngineDefinition
+				.getStandardDef();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.badlogic.gdx.ApplicationListener#pause()
+	 */
 	@Override
 	public void pause() {
 		preferences.flush();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.badlogic.gdx.ApplicationListener#render()
+	 */
 	@Override
 	public void render() {
 
@@ -361,7 +449,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		checkNetworkReplies();
 
 		if (!showUI) {
-			
+
 			g.deltaTime = Gdx.graphics.getDeltaTime();
 			g.setColor(Color.valueOf(getPrefString("bgColor")));
 			g.fillRect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -374,8 +462,32 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 
 		g.endDrawing();
+
+		if (isFlagged()) {
+			requestSend();
+		}
 	}
 
+	public boolean isFlagged() {
+
+		for (Property<?> p : getProperties()) {
+			if (p.flag() != Flag.NONE) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public void resetFlags() {
+
+		for (Property<?> p : getProperties()) {
+			p.setFlag(Flag.NONE);
+		}
+	}
+
+	/**
+	 * Check network replies.
+	 */
 	private void checkNetworkReplies() {
 
 		while (replyQueue.getSize() > 0) {
@@ -395,7 +507,8 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 				Gdx.app.log("RECEIVE", c.s);
 				try {
 					if (!gotBlockedIncomingNetworkTrafficInMeantime()) {
-						setPropertiesFromInformation(Information.StringToInformations(c.s));
+						setPropertiesFromInformation(Information
+								.StringToInformations(c.s));
 					} else {
 						waitingForIncomingNetworkTraffic = false;
 						if (!isBlockingIncomingNetworkTraffic()) {
@@ -422,6 +535,9 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/**
+	 * Check player registration.
+	 */
 	private void checkPlayerRegistration() {
 
 		String id = preferences.getString("playerID");
@@ -432,18 +548,23 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		if (playerList.contains(id)) {
 			if (!playerList.getByID(id).toString().equals(content)) {
 				playerList.getByID(id).fromString(content);
-				playerList.setFlag(Flag.ADD_CHANGE);
+				playerList.setFlag(Flag.UPDATE);
 				requestSend();
 			}
 		} else {
 			Player p = new Player();
 			p.fromString(content);
 			playerList.get().add(p);
-			playerList.setFlag(Flag.ADD_CHANGE);
+			playerList.setFlag(Flag.UPDATE);
 			requestSend();
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.badlogic.gdx.ApplicationListener#resize(int, int)
+	 */
 	@Override
 	public void resize(final int width, final int height) {
 		camera.setToOrtho(false, width, height);
@@ -458,22 +579,47 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.badlogic.gdx.ApplicationListener#resume()
+	 */
 	@Override
 	public void resume() {
 		preferences = Gdx.app.getPreferences("TableEngine");
 	}
 
+	/**
+	 * Sets the ui.
+	 * 
+	 * @param ui
+	 *            the new ui
+	 */
 	public void setUI(Stage ui) {
 
 		this.ui = ui;
 	}
 
+	/**
+	 * Sets the ui.
+	 * 
+	 * @param ui
+	 *            the ui
+	 * @param showUI
+	 *            the show ui
+	 */
 	public void setUI(final Stage ui, final boolean showUI) {
 
 		this.ui = ui;
 		switchUI(showUI);
 	}
 
+	/**
+	 * Switch ui.
+	 * 
+	 * @param showUI
+	 *            the show ui
+	 */
 	public void switchUI(final boolean showUI) {
 
 		if (!showUI) {
@@ -491,6 +637,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 
 	}
 
+	/**
+	 * Sets the full screen.
+	 * 
+	 * @param fullScreen
+	 *            the new full screen
+	 */
 	public void setFullScreen(boolean fullScreen) {
 
 		if (Gdx.graphics.supportsDisplayModeChange()) {
@@ -505,6 +657,13 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.engine.Synchronizable#setPropertiesFromInformation(org.engine.utils
+	 * .Array)
+	 */
 	public void setPropertiesFromInformation(Array<Information> ai) {
 
 		Property<?>[] ap = new Property[] { animationList, banList, chatList,
@@ -523,52 +682,66 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.engine.Synchronizable#getProperties()
+	 */
 	public Array<Property<?>> getProperties() {
 
-		Array<Property<?>> propertyArray = new Array<Property<?>>(new Property<?>[] { animationList, banList, chatList,
-				playerList });
-
-		for (SyncProperty p : syncLayerList) {
-
-			propertyArray.add(p);
-		}
-		propertyArray.add(objID);
 		return propertyArray;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.engine.Synchronizable#getPropertiesFlagged()
+	 */
 	@Override
 	public Array<Property<?>> getPropertiesFlagged() {
 
-		Array<Property<?>> propertyArray = new Array<Property<?>>();
-		Property<?>[] ap = new Property[] { animationList, banList, chatList,
-				playerList, objID };
-		for (Property<?> p : ap) {
+		flaggedPropertyArray.clear();
+		for (Property<?> p : propertyArray) {
 
 			if (p.flag() != Property.Flag.NONE) {
-				propertyArray.add(p);
+				flaggedPropertyArray.add(p);
 			}
 		}
-
-		for (SyncProperty p : syncLayerList) {
-
-			if (p.flag() != Flag.NONE) {
-				propertyArray.add(p);
-			}
+		if (flaggedPropertyArray.getSize() > 0) {
+			return flaggedPropertyArray;
 		}
-		return propertyArray;
+		return null;
 	}
 
+	/**
+	 * Adds the animation.
+	 * 
+	 * @param animation
+	 *            the animation
+	 */
 	public void addAnimation(String animation) {
 
 		animationList.get().add(animation);
 		performedAnimations.add(animation);
 	}
-	
+
+	/**
+	 * Adds the chat message.
+	 * 
+	 * @param string
+	 *            the string
+	 */
 	public void addChatMessage(String string) {
 
 		animationList.get().add(string);
 	}
 
+	/**
+	 * Debug order.
+	 * 
+	 * @param order
+	 *            the order
+	 */
 	private void debugOrder(String order) {
 
 		if (order.startsWith("Skin")) {
@@ -588,6 +761,13 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/**
+	 * Gets the layer.
+	 * 
+	 * @param label
+	 *            the label
+	 * @return the layer
+	 */
 	public Layer getLayer(String label) {
 
 		for (Layer l : layerList) {
@@ -598,27 +778,74 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		return null;
 	}
 
+	/**
+	 * Gets the data.
+	 * 
+	 * @param resource
+	 *            the resource
+	 * @param name
+	 *            the name
+	 * @return the data
+	 */
 	public String getData(String resource, String name) {
 		return resourceMap.getValue(resource).getData(name);
 	}
 
+	/**
+	 * Gets the description.
+	 * 
+	 * @return the description
+	 */
 	public String getDescription() {
 		return "TABLE_ENGINE";
 	}
 
+	/**
+	 * Gets the image.
+	 * 
+	 * @param resource
+	 *            the resource
+	 * @param name
+	 *            the name
+	 * @return the image
+	 */
 	public TextureRegion getImage(String resource, String name) {
 		return resourceMap.getValue(resource).getImage(name);
 
 	}
 
+	/**
+	 * Gets the sound.
+	 * 
+	 * @param resource
+	 *            the resource
+	 * @param name
+	 *            the name
+	 * @return the sound
+	 */
 	public Sound getSound(String resource, String name) {
 		return resourceMap.getValue(resource).getSound(name);
 	}
 
+	/**
+	 * Gets the skin.
+	 * 
+	 * @param resource
+	 *            the resource
+	 * @param name
+	 *            the name
+	 * @return the skin
+	 */
 	public Skin getSkin(String resource, String name) {
 		return resourceMap.getValue(resource).getSkin(name);
 	}
 
+	/**
+	 * Sets the language.
+	 * 
+	 * @param locale
+	 *            the new language
+	 */
 	public void setLanguage(Locale locale) {
 
 		language.clear();
@@ -630,17 +857,33 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/**
+	 * Gets the text.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the text
+	 */
 	public String getText(String key) {
 
 		return language.getProperty(key);
 	}
 
+	/**
+	 * Reset databases.
+	 */
 	public void resetDatabases() {
 		for (Resource r : resourceMap.values()) {
 			r.resetDatabases();
 		}
 	}
 
+	/**
+	 * The main method.
+	 * 
+	 * @param args
+	 *            the arguments
+	 */
 	public static void main(String[] args) {
 
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
@@ -648,41 +891,90 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		cfg.useGL20 = true;
 		cfg.width = 480;
 		cfg.height = 320;
-		
+
 		TableEngine t = new TableEngine();
 		new LwjglApplication(t, cfg);
-		if (args[0] != null) {
-			if (args[0].equals("debug")) {
-				new DebugWindow(t).open();
-			}
-		}
-		System.out.println(t.getPrefBoolean("debug") + " debug");
+//		if (args.length > 0 && args[0] != null) {
+//			if (args[0].equals("debug")) {
+//				new DebugWindow(t).open();
+//			}
+//		}
+		new DebugWindow(t).open();
+
 	}
 
+	/**
+	 * Gets the pref string.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the pref string
+	 */
 	public String getPrefString(String key) {
 		return preferences.getString(key, "String not found");
 	}
 
+	/**
+	 * Gets the pref integer.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the pref integer
+	 */
 	public int getPrefInteger(String key) {
 		return preferences.getInteger(key, -1);
 	}
 
+	/**
+	 * Gets the pref float.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the pref float
+	 */
 	public float getPrefFloat(String key) {
 		return preferences.getFloat(key, -1.0F);
 	}
 
+	/**
+	 * Gets the pref long.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the pref long
+	 */
 	public long getPrefLong(String key) {
 		return preferences.getLong(key, -1L);
 	}
 
+	/**
+	 * Gets the pref boolean.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return the pref boolean
+	 */
 	public boolean getPrefBoolean(String key) {
 		return preferences.getBoolean(key, false);
 	}
 
+	/**
+	 * Checks if is pref available.
+	 * 
+	 * @param key
+	 *            the key
+	 * @return true, if is pref available
+	 */
 	public boolean isPrefAvailable(String key) {
 		return preferences.contains(key);
 	}
 
+	/**
+	 * Check key.
+	 * 
+	 * @param key
+	 *            the key
+	 */
 	private void checkKey(String key) {
 		if (!preferences.contains(key)) {
 			Gdx.app.error(
@@ -691,31 +983,77 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/**
+	 * Put string.
+	 * 
+	 * @param key
+	 *            the key
+	 * @param val
+	 *            the val
+	 */
 	public void putString(String key, String val) {
 		checkKey(key);
 		preferences.putString(key, val);
 	}
 
+	/**
+	 * Put pref integer.
+	 * 
+	 * @param key
+	 *            the key
+	 * @param val
+	 *            the val
+	 */
 	public void putPrefInteger(String key, int val) {
 		checkKey(key);
 		preferences.putInteger(key, val);
 	}
 
+	/**
+	 * Put pref float.
+	 * 
+	 * @param key
+	 *            the key
+	 * @param val
+	 *            the val
+	 */
 	public void putPrefFloat(String key, float val) {
 		checkKey(key);
 		preferences.putFloat(key, val);
 	}
 
+	/**
+	 * Put pref long.
+	 * 
+	 * @param key
+	 *            the key
+	 * @param val
+	 *            the val
+	 */
 	public void putPrefLong(String key, long val) {
 		checkKey(key);
 		preferences.putLong(key, val);
 	}
 
+	/**
+	 * Put pref boolean.
+	 * 
+	 * @param key
+	 *            the key
+	 * @param val
+	 *            the val
+	 */
 	public void putPrefBoolean(String key, boolean val) {
 		checkKey(key);
 		preferences.putBoolean(key, val);
 	}
 
+	/**
+	 * Input.
+	 * 
+	 * @param inputEvent
+	 *            the input event
+	 */
 	public void input(InputEvent inputEvent) {
 
 		boolean catched = false;
@@ -729,6 +1067,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/**
+	 * Output.
+	 * 
+	 * @param g
+	 *            the g
+	 */
 	public void output(Graphics g) {
 
 		for (Layer l : outputLayerList) {
@@ -757,6 +1101,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	 * Scenario 3: MOVE CURSOR -> BLOCK TRAFFIC ... RECEIVE-START -> DO NOTHING
 	 * ... CURSOR DONE -> UNBLOCK TRAFFIC -> NO FLAG SET, RESET BLOCK
 	 */
+	/**
+	 * Sets the block incoming network traffic.
+	 * 
+	 * @param blockIncomingNetworkTraffic
+	 *            the new block incoming network traffic
+	 */
 	public void setBlockIncomingNetworkTraffic(
 			final boolean blockIncomingNetworkTraffic) {
 
@@ -770,31 +1120,57 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		this.blockIncomingNetworkTraffic = blockIncomingNetworkTraffic;
 	}
 
+	/**
+	 * Got blocked incoming network traffic in meantime.
+	 * 
+	 * @return true, if successful
+	 */
 	public boolean gotBlockedIncomingNetworkTrafficInMeantime() {
 
 		return rememberGotBlocked;
 	}
 
+	/**
+	 * Reset remember block.
+	 */
 	public void resetRememberBlock() {
 
 		rememberGotBlocked = false;
 	}
 
+	/**
+	 * Checks if is blocking incoming network traffic.
+	 * 
+	 * @return true, if is blocking incoming network traffic
+	 */
 	public boolean isBlockingIncomingNetworkTraffic() {
 
 		return blockIncomingNetworkTraffic;
 	}
 
+	/**
+	 * The Enum RequestCommand.
+	 */
 	public enum RequestCommand {
 
-		Info, Key, Send, Receive, TimeStamp, Debug;
+		/** The Info. */
+		Info, /** The Key. */
+		Key, /** The Send. */
+		Send, /** The Receive. */
+		Receive, /** The Time stamp. */
+		TimeStamp, /** The Debug. */
+		Debug;
 	}
 
+	/**
+	 * Request send.
+	 */
 	public void requestSend() {
 
 		final TableEngine t = this;
 		if (waitingForSend == 0) {
-
+			
+			waitingForSend++;
 			new Thread() {
 
 				private int waitSendingMillis = 1000;
@@ -832,6 +1208,9 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 
 	}
 
+	/**
+	 * Request receive.
+	 */
 	public void requestReceive() {
 
 		if (!isBlockingIncomingNetworkTraffic()) {
@@ -840,12 +1219,25 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.engine.network.Network.NetworkListener#error(java.lang.Throwable,
+	 * java.lang.String)
+	 */
 	@Override
 	public void error(Throwable t, String action) {
 
 		Gdx.app.error("SERVER ERROR: " + action, t.getMessage());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.engine.network.Network.NetworkListener#info(org.engine.utils.Array)
+	 */
 	@Override
 	public void info(Array<Slot> slotArray) {
 
@@ -855,6 +1247,11 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		replyQueue.add(rc);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.engine.network.Network.NetworkListener#key(boolean)
+	 */
 	@Override
 	public void key(boolean validKey) {
 
@@ -864,6 +1261,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		replyQueue.add(rc);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.engine.network.Network.NetworkListener#receive(long,
+	 * java.lang.String)
+	 */
 	@Override
 	public void receive(long lastTimeStamp, String response) {
 
@@ -874,6 +1277,11 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		replyQueue.add(rc);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.engine.network.Network.NetworkListener#send(long, boolean)
+	 */
 	@Override
 	public void send(long lastTimeStamp, boolean sendSuccess) {
 
@@ -884,6 +1292,11 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		replyQueue.add(rc);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.engine.network.Network.NetworkListener#timestamp(long)
+	 */
 	@Override
 	public void timestamp(long lastTimeStamp) {
 
@@ -893,6 +1306,11 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		replyQueue.add(rc);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.engine.network.Network.NetworkListener#debug(java.lang.String)
+	 */
 	@Override
 	public void debug(String response) {
 
@@ -902,18 +1320,37 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 		replyQueue.add(rc);
 	}
 
+	/**
+	 * Gets the new object id.
+	 * 
+	 * @param c
+	 *            the c
+	 * @return the new object id
+	 */
 	public String getNewObjectID(Class<?> c) {
 
 		objID.set(objID.get() + 1);
 		return c.getCanonicalName() + "-" + objID.get();
 	}
 
+	/**
+	 * The Class ReplyCommand.
+	 */
 	public class ReplyCommand {
 
+		/** The type. */
 		public RequestCommand type;
+
+		/** The s. */
 		public String s;
+
+		/** The b. */
 		public boolean b;
+
+		/** The l. */
 		public long l;
+
+		/** The a. */
 		public Array<Slot> a;
 	}
 }

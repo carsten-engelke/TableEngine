@@ -28,30 +28,38 @@ public class Layer {
 	/** The depth. */
 	public IntegerProperty depth;
 
-	/** The label. {@link TableEngine#getLayer(String)} returns this layer when fed with it's label.*/
+	/**
+	 * The label. {@link TableEngine#getLayer(String)} returns this layer when
+	 * fed with it's label.
+	 */
 	public StringProperty label;
 
-	/** If persistent, TableEngine will not forward input to underlying labels if one of the Interactables of this label returns true when confronted with an InputEvent */
+	/**
+	 * If persistent, TableEngine will not forward input to underlying labels if
+	 * one of the Interactables of this label returns true when confronted with
+	 * an InputEvent
+	 */
 	public BooleanProperty persistent;
 
-	/** The gui. Used by TableEngine to access input and output of the Interactables. */
+	/**
+	 * The gui. Used by TableEngine to access input and output of the
+	 * Interactables.
+	 */
 	public GUIProperty gui;
 
-	/** The rigid properties depth, label, persistent and gui.*/
-	protected Property<?>[] rigidProps = new Property[] { depth, gui, label,
-			persistent };
+	/** The rigid properties depth, label, persistent and gui. */
+	protected Property<?>[] rigidProps;
 
 	/** The property array. */
-	protected Array<Property<?>> propertyArray = new Array<Property<?>>(
-			rigidProps);
+	protected Array<Property<?>> propertyArray;
 
 	//
-	/** The {@link Interactable} array stores added Interactables.*/
+	/** The {@link Interactable} array stores added Interactables. */
 	protected Array<Interactable> a = new Array<Interactable>();
 
 	/** The parent TableEngine */
 	public TableEngine t;
-	
+
 	protected Property<?> tmpProp;
 
 	/**
@@ -71,7 +79,11 @@ public class Layer {
 		this.gui = new GUIProperty("GUI", LAYER_TAG, Flag.NONE, gui);
 		this.label = new StringProperty("LABEL", LAYER_TAG, Flag.NONE, label);
 		this.depth = new IntegerProperty("DEPTH", LAYER_TAG, Flag.NONE, depth);
-		this.persistent = new BooleanProperty("PERS", LAYER_TAG, Flag.NONE, persistent);
+		this.persistent = new BooleanProperty("PERS", LAYER_TAG, Flag.NONE,
+				persistent);
+		rigidProps = new Property[] { this.depth, this.gui, this.label,
+				this.persistent };
+		propertyArray = new Array<Property<?>>(rigidProps);
 	}
 
 	/**
@@ -209,6 +221,9 @@ public class Layer {
 
 				if (Property.class.isAssignableFrom(i.getClass())) {
 					propertyArray.add(((Property<?>) i));
+				} else {
+					System.out.println("NOT A PROPERTY:"
+							+ i.getClass().getCanonicalName());
 				}
 			}
 			return propertyArray;
@@ -225,7 +240,7 @@ public class Layer {
 			propertyArray.clear();
 			for (Property<?> p : rigidProps) {
 
-				if (p.flag() != Property.Flag.NONE) {
+				if (p.flag() != Flag.NONE) {
 
 					propertyArray.add(p);
 				}
@@ -239,7 +254,10 @@ public class Layer {
 					}
 				}
 			}
-			return propertyArray;
+			if (propertyArray.getSize() > 0) {
+				return propertyArray;
+			}
+			return null;
 		}
 	}
 

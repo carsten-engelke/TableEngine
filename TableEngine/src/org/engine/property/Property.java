@@ -38,9 +38,21 @@ public interface Property<T> {
 	 */
 	public Information info();
 
+	public Information infoFlagOnly();
 	/**
 	 * Sets a {@link Flag} to this {@link Property}. This is later seen by the
-	 * Network, send to server and reseted. Update it before handing out.
+	 * Network, send to server and reseted.
+	 * 
+	 * If changes, that are to be shared via network, were made to a Property
+	 * use this method combined with {@link Flag#UPDATE} and the network
+	 * will automatically forward the changes to the server. Working that way
+	 * this is the most important network method for objects.
+	 * 
+	 * If the parent {@link Synchronizable} supports removing a
+	 * <code>Property</code> in it's
+	 * {@link Synchronizable#setPropertiesFromInformation(org.engine.utils.Array)}
+	 * method, setting the flag to {@link Flag#REMOVE} is the right way to do
+	 * so.
 	 * 
 	 * @param f
 	 *            the flag
@@ -63,14 +75,14 @@ public interface Property<T> {
 	public void applySyncInfo(Information i);
 
 	/**
-	 * Gets the actual object this {@link Property} was wrapped around.
+	 * Gets the object this {@link Property} was wrapped around.
 	 * 
 	 * @return the Object or Primitive.
 	 */
 	public T get();
 
 	/**
-	 * Sets the actual object to the value.
+	 * Sets the wrapped object to the value.
 	 * 
 	 * @param value
 	 *            is the new value.
@@ -86,7 +98,7 @@ public interface Property<T> {
 
 		/** Not flagged. */
 		NONE, /** Add or update this Property. */
-		ADD_CHANGE, /** Remove this Property. */
+		UPDATE, /** Remove this Property. */
 		REMOVE;
 	}
 }

@@ -27,7 +27,7 @@ public class DialogFactory {
 			public void changed(final ChangeEvent event, final Actor actor) {
 				slave.receiveOrder(button1);
 				t.switchUI(
-						TableEngine.SHOW_UNIVERSE);
+						TableEngine.SHOW_TABLE);
 			}
 		});
 		tab.add(button).fill().expandX();
@@ -50,7 +50,7 @@ public class DialogFactory {
 			public void changed(final ChangeEvent event, final Actor actor) {
 				slave.receiveOrder(button1);
 				t.switchUI(
-						TableEngine.SHOW_UNIVERSE);
+						TableEngine.SHOW_TABLE);
 			}
 		});
 		tab.add(buttonT1).fill().expandX();
@@ -61,7 +61,7 @@ public class DialogFactory {
 			public void changed(final ChangeEvent event, final Actor actor) {
 				slave.receiveOrder(button2);
 				t.switchUI(
-						TableEngine.SHOW_UNIVERSE);
+						TableEngine.SHOW_TABLE);
 			}
 		});
 		tab.add(buttonT2).fill().expandX();

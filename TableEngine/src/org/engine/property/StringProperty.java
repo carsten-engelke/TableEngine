@@ -42,4 +42,10 @@ public class StringProperty implements Property<String> {
 
 		this.i.flag = f;
 	}
+
+	@Override
+	public Information infoFlagOnly() {
+
+		return info();
+	}
 }

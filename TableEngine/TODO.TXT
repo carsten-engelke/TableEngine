@@ -1,6 +1,6 @@
 TableEngine-Todo-Liste
 
-IDEEN:
+UNDER CONSTRUCTION:
 
  - Netzwerkcode umbauen -> Eine Property muss über eine Reihe von IDs eindeutig identifizierbar sein, 
   dann kann der Netzwerkcode auf die tatsächlich geänderten Propertys beschränkt werden.
@@ -13,9 +13,10 @@ TODO:
  - Debug Mode
  - Mapping Mode
  - BasicDefaultLanguage sortieren
- - Objekt-Klassen auslagern
  - ALLE KLASSEN ÖKONOMISIEREN (wiederverwendete Klassen nicht jedesmal neu erstellen sondern nur signifikante Werte zuweisen)
  DONE:
+  - Objekt-Klassen auslagern
+ - TextServer läuft prinzipiell -> NOCH AUSGIEBIG TESTEN!!!
   - Input an LibGdx namentlich angleichen.
  - BasicObject AffineTransform Shift einbauen!!!
  - BasicObject in BasicInteractable aufteilen

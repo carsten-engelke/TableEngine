@@ -71,4 +71,9 @@ public class GUIProperty implements Property<GUI> {
 
 		i.flag = f;
 	}
+	@Override
+	public Information infoFlagOnly() {
+
+		return info();
+	}
 }

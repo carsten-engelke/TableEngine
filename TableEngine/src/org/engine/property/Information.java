@@ -29,7 +29,7 @@ public class Information {
 		if (f == Flag.NONE) {
 			return '0';
 		}
-		if (f == Flag.ADD_CHANGE) {
+		if (f == Flag.UPDATE) {
 			return '+';
 		}
 		if (f == Flag.REMOVE) {
@@ -43,7 +43,7 @@ public class Information {
 			return Flag.NONE;
 		}
 		if (s.startsWith("+")) {
-			return Flag.ADD_CHANGE;
+			return Flag.UPDATE;
 		}
 		if (s.startsWith("-")) {
 			return Flag.REMOVE;
@@ -60,32 +60,70 @@ public class Information {
 
 		return InformationsToString(PropertiesToInformations(ap));
 	}
+	
+	public static String PropertiesToStringFlagOnly(Array<Property<?>> ap) {
+
+		return InformationsToString(PropertiesToInformationsFlagOnly(ap));
+	}
 
 	public static Array<Information> PropertiesToInformations(
 			Array<Property<?>> ap) {
 
-		Array<Information> ai = new Array<Information>(ap.getSize());
-		for (Property<?> p : ap) {
-			ai.add(p.info());
+		if (ap != null) {
+
+			Array<Information> ai = new Array<Information>(ap.getSize());
+			for (Property<?> p : ap) {
+
+				ai.add(p.info());
+			}
+			return ai;
 		}
-		return ai;
+		return null;
+	}
+	
+	public static Array<Information> PropertiesToInformationsFlagOnly(
+			Array<Property<?>> ap) {
+
+		if (ap != null) {
+
+			Array<Information> ai = new Array<Information>(ap.getSize());
+			for (Property<?> p : ap) {
+
+				ai.add(p.infoFlagOnly());
+			}
+			return ai;
+		}
+		return null;
 	}
 
 	public static String InformationToString(Information i) {
 
-		// <TAG>ID<:TAG<>FLAG>CONTENT</TAG>
-		return "<" + i.tag + ">" + i.id + "<:" + i.tag + "<>"
-				+ Information.FlagToString(i.flag) + ">" + i.content + "</"
-				+ i.tag + ">";
+		if (i != null) {
+
+			// <TAG>ID<:TAG<>FLAG>CONTENT</TAG>
+			return "<" + i.tag + ">" + i.id + "<:" + i.tag + "<>"
+					+ Information.FlagToString(i.flag) + ">" + i.content + "</"
+					+ i.tag + ">";
+		}
+		return null;
 	}
 
+	public static String ReadableInfoString(Array<Information> a) {
+		
+		String s = "";
+		for (Information i : a) {
+			s+= ReadableInfoString(i, 0);
+		}
+		return s;
+	}
+	
 	public static String ReadableInfoString(Information i, int level) {
 
 		String s = "\n";
 		for (int j = 0; j < level; j++) {
 			s += "    ";
 		}
-		s += "<" + i.id + ": ";
+		s += "<"+ FlagToString(i.flag) + i.id + ": ";
 		try {
 			s += "{";
 			for (Information subInfo : StringToInformations(i.content)) {
@@ -105,131 +143,108 @@ public class Information {
 
 	public static String InformationsToString(Array<Information> array) {
 
-		// sort Array according to tag
-		ArrayMap<Information, String> sortedInfo = new ArrayMap<Information, String>(
-				array.getSize());
-		for (Information i : array) {
+		if (array != null) {
 
-			sortedInfo.put(i, i.tag);
+			// sort Array according to tag
+			ArrayMap<Information, String> sortedInfo = new ArrayMap<Information, String>(
+					array.getSize());
+			for (Information i : array) {
 
-		}
-		sortedInfo.sortToValues();
-		// shorten String (not XML)
-		String s = "";
-		String lastTag = null;
-		for (Information i : sortedInfo.keys()) {
-
-			if (lastTag != null && i.tag.equals(lastTag)) {
-				s = s.substring(0, s.lastIndexOf("</" + i.tag + ">"));
+				sortedInfo.put(i, i.tag);
 			}
-			s += "<" + i.tag + ">" + i.id + "<:" + i.tag + "<>"
-					+ Information.FlagToString(i.flag) + ">" + i.content + "</"
-					+ i.tag + ">";
-			lastTag = i.tag;
+			sortedInfo.sortToValues();
+			// shorten String (not XML)
+			String s = "";
+			String lastTag = null;
+			for (Information i : sortedInfo.keys()) {
+
+				if (lastTag != null && i.tag.equals(lastTag)) {
+
+					s = s.substring(0, s.lastIndexOf("</" + i.tag + ">"));
+				}
+				s += "<" + i.tag + ">" + i.id + "<:" + i.tag + "<>"
+						+ Information.FlagToString(i.flag) + ">" + i.content
+						+ "</" + i.tag + ">";
+				lastTag = i.tag;
+			}
+			return s;
 		}
-		return s;
-	}
-
-	public static Information StringToInformation(String input)
-			throws InformationStringException {
-
-		String tag = null;
-		String start = null;
-		String sep = null;
-		Flag flag = null;
-		String end = null;
-		String id = null;
-		String content = null;
-		try {
-			tag = input.substring(input.indexOf("<") + 1, input.indexOf(">"));
-			start = "<" + tag + ">";
-			sep = "<:" + tag + "<>";
-			end = "</" + tag + ">";
-			id = input.substring(input.indexOf(start) + start.length(),
-					input.indexOf(sep));
-			flag = Information.StringToFlag(input.substring(input.indexOf(sep)
-					+ sep.length(), input.indexOf(sep) + sep.length() + 1));
-			content = input.substring(
-					input.indexOf(">", input.indexOf(sep) + sep.length()) + 1,
-					input.indexOf(end));
-			return new Information(id, tag, flag, content);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new InformationStringException(input);
-		}
-
+		return null;
 	}
 
 	public static Array<Information> StringToInformations(String input)
 			throws InformationArrayStringException {
 
-		String tag = null;
-		String start = null;
-		String sep = null;
-		String end = null;
-		String id = null;
-		Flag flag = null;
-		String content = null;
-		Array<Information> a = new Array<Information>();
-		try {
+		if (input != null && input.contains("<") && input.contains(">")) {
+			String tag = null;
+			String start = null;
+			String sep = null;
+			String end = null;
+			String id = null;
+			Flag flag = null;
+			String content = null;
+			Array<Information> a = new Array<Information>();
+			try {
 
-			tag = input.substring(input.indexOf("<") + 1, input.indexOf(">"));
-			start = "<" + tag + ">";
-			sep = "<:" + tag + "<>";
-			end = "</" + tag + ">";
+				tag = input.substring(input.indexOf("<") + 1,
+						input.indexOf(">"));
+				start = "<" + tag + ">";
+				sep = "<:" + tag + "<>";
+				end = "</" + tag + ">";
 
-			for (String strBlock : input.split(end)) {
+				for (String strBlock : input.split(end)) {
 
-				if (strBlock.contains(start)) {
+					if (strBlock.contains(start)) {
 
-					String cutOUT = strBlock.substring(0,
-							strBlock.indexOf(start));
-					if (!cutOUT.equals("")) {
-						throw new InformationArrayStringException(input
-								+ " CUTOUT: " + cutOUT);
-					}
-					strBlock = strBlock.substring(strBlock.indexOf(start));
-					for (String info : strBlock.split(start)) {
+						String cutOUT = strBlock.substring(0,
+								strBlock.indexOf(start));
+						if (!cutOUT.equals("")) {
+							throw new InformationArrayStringException(input
+									+ " CUTOUT: " + cutOUT);
+						}
+						strBlock = strBlock.substring(strBlock.indexOf(start));
+						for (String info : strBlock.split(start)) {
 
-						if (info.contains(sep)) {
+							if (info.contains(sep)) {
 
-							id = info.substring(0, info.indexOf(sep));
-							flag = Information.StringToFlag(info.substring(
-									info.indexOf(sep) + sep.length(),
-									info.indexOf(sep) + sep.length() + 1));
-							content = info.substring(info.indexOf(">", info.indexOf(sep)
-									+ sep.length()) + 1);
-							a.add(new Information(id, tag, flag, content));
+								id = info.substring(0, info.indexOf(sep));
+								flag = Information.StringToFlag(info.substring(
+										info.indexOf(sep) + sep.length(),
+										info.indexOf(sep) + sep.length() + 1));
+								content = info.substring(info.indexOf(">",
+										info.indexOf(sep) + sep.length()) + 1);
+								a.add(new Information(id, tag, flag, content));
 
-						} else {
+							} else {
 
-							if (!info.equals("")) {
+								if (!info.equals("")) {
 
-								throw new InformationArrayStringException(
-										info
-												+ " Information String not containing separation tag ("
-												+ sep + ")");
+									throw new InformationArrayStringException(
+											info
+													+ " Information String not containing separation tag ("
+													+ sep + ")");
+								}
 							}
 						}
-					}
 
-				} else {
+					} else {
 
-					if (!strBlock.equals("")) {
+						if (!strBlock.equals("")) {
 
-						throw new InformationArrayStringException(
-								strBlock
-										+ "Information String not containing start tag ("
-										+ start + ")");
+							throw new InformationArrayStringException(
+									strBlock
+											+ "Information String not containing start tag ("
+											+ start + ")");
+						}
 					}
 				}
+				return a;
+
+			} catch (Exception e) {
+
+				throw new InformationArrayStringException(input);
 			}
-			return a;
-
-		} catch (Exception e) {
-
-			throw new InformationArrayStringException(input);
 		}
+		return null;
 	}
 }

@@ -2,11 +2,11 @@ package org.engine.debug;
 
 import org.engine.geometry.Rectangle;
 import org.engine.gui.output.Graphics;
-import org.engine.object.BasicInteractable;
+import org.engine.object.BasicObject;
 
 import com.badlogic.gdx.graphics.Color;
 
-public class TestInteractable extends BasicInteractable{
+public class TestInteractable extends BasicObject{
 
 	public TestInteractable() {
 		

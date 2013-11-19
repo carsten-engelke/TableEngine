@@ -100,5 +100,10 @@ public class Rectangle extends com.badlogic.gdx.math.Rectangle {
 
 			this.value.applyString(value.asString());
 		}
+		@Override
+		public Information infoFlagOnly() {
+
+			return info();
+		}
 	}
 }

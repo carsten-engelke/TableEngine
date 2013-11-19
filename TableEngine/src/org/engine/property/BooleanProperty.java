@@ -46,4 +46,10 @@ public class BooleanProperty implements Property<Boolean> {
 
 		i.flag = f;
 	}
+
+	@Override
+	public Information infoFlagOnly() {
+
+		return info();
+	}
 }

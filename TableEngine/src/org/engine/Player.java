@@ -125,5 +125,11 @@ public class Player {
 			
 			i.flag = f;
 		}
+
+		@Override
+		public Information infoFlagOnly() {
+
+			return info();
+		}
 	}
 }

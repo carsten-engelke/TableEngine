@@ -47,4 +47,10 @@ public class IntegerProperty implements Property<Integer> {
 
 		this.i.flag = f;
 	}
+
+	@Override
+	public Information infoFlagOnly() {
+
+		return info();
+	}
 }

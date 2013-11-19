@@ -46,4 +46,10 @@ public class FloatProperty implements Property<Float> {
 
 		this.i.flag = f;
 	}
+
+	@Override
+	public Information infoFlagOnly() {
+
+		return info();
+	}
 }

@@ -1,6 +1,7 @@
 package org.engine;
 
 import org.engine.menu.Menu;
+import org.engine.resource.Resource;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -48,9 +49,9 @@ public interface Skinnable {
 	public void adaptToScreenSize(int width, int height);
 
 	/**
-	 * The class Style is just a containe for {@link Drawable} objects, see {@link Menu} for use.
+	 * The class Style is just a container for public {@link Drawable} objects, see {@link Menu} or {@link Skin} for use. The stored drawing resources should be stored in a JSON file, loaded by the game's {@link Resource} class.
 	 */
 	public class Style {
-
+		
 	}
 }

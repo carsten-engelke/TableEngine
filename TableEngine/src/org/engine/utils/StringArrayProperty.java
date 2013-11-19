@@ -95,4 +95,10 @@ public class StringArrayProperty implements Property<Array<String>> {
 
 			i.flag = f;
 		}
+
+		@Override
+		public Information infoFlagOnly() {
+
+			return info();
+		}
 	}

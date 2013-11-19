@@ -112,6 +112,11 @@ public class Vector3 extends com.badlogic.gdx.math.Vector3 {
 
 			return i.flag;
 		}
+		@Override
+		public Information infoFlagOnly() {
+
+			return info();
+		}
 		
 	}
 }

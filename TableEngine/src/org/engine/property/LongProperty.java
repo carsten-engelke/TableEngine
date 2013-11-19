@@ -46,4 +46,10 @@ public class LongProperty implements Property<Long> {
 
 		this.i.flag = f;
 	}
+
+	@Override
+	public Information infoFlagOnly() {
+
+		return info();
+	}
 }

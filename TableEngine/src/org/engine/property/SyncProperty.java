@@ -11,8 +11,8 @@ public class SyncProperty implements Property<Synchronizable> {
 	public SyncProperty(String id, String tag, Flag f, Synchronizable value) {
 
 		this.value = value;
-		this.i = new Information(id, tag, f, Information.PropertiesToString(value
-						.getProperties()));
+		this.i = new Information(id, tag, f,
+				Information.PropertiesToString(value.getProperties()));
 	}
 
 	@Override
@@ -20,16 +20,6 @@ public class SyncProperty implements Property<Synchronizable> {
 
 		i.content = Information.PropertiesToString(value.getProperties());
 		return i;
-	}
-
-	public Information infoFlaggedOnly() {
-
-		Array<Property<?>> a = value.getPropertiesFlagged();
-		if (a != null && a.getSize() > 0) {
-			i.content = Information.PropertiesToString(a);
-			return i;
-		}
-		return null;
 	}
 
 	@Override
@@ -68,7 +58,7 @@ public class SyncProperty implements Property<Synchronizable> {
 		if (i.flag == Flag.NONE) {
 			if (value.getPropertiesFlagged() != null
 					&& value.getPropertiesFlagged().getSize() > 0) {
-				i.flag = Flag.ADD_CHANGE;
+				i.flag = Flag.UPDATE;
 			}
 		}
 		return i.flag;
@@ -77,6 +67,20 @@ public class SyncProperty implements Property<Synchronizable> {
 	@Override
 	public void setFlag(Flag f) {
 
+		for (Property<?> p : value.getProperties()) {
+			p.setFlag(f);
+		}
 		this.i.flag = f;
+	}
+
+	@Override
+	public Information infoFlagOnly() {
+
+		Array<Property<?>> a = value.getPropertiesFlagged();
+		if (a != null && a.getSize() > 0) {
+			i.content = Information.PropertiesToStringFlagOnly(a);
+			return i;
+		}
+		return null;
 	}
 }
