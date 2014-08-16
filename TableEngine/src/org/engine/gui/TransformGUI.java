@@ -6,7 +6,6 @@ package org.engine.gui;
 import org.engine.Interactable;
 import org.engine.Layer;
 import org.engine.TableEngine;
-import org.engine.geometry.Rectangle;
 import org.engine.geometry.Vector2;
 import org.engine.geometry.Vector3;
 import org.engine.gui.input.InputEvent;
@@ -38,8 +37,6 @@ public class TransformGUI implements GUI {
 	private TransformView v = new TransformView();
 
 	private boolean dragging;
-
-	private final Rectangle drawingArea = new Rectangle();
 
 	private final Matrix4 invertMatrix = new Matrix4();
 

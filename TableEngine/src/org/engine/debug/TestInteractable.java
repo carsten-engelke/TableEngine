@@ -8,6 +8,11 @@ import com.badlogic.gdx.graphics.Color;
 
 public class TestInteractable extends BasicObject{
 
+	/**
+	 * just for testing purposes!!!
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public TestInteractable() {
 		
 		super(new Rectangle(100,100, 100, 100), 1, 0, 90);

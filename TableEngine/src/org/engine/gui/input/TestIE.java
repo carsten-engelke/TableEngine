@@ -2,6 +2,7 @@ package org.engine.gui.input;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.Pixmap;
 
 public class TestIE implements Input {
 
@@ -227,6 +228,18 @@ public class TestIE implements Input {
 	public void setCursorPosition(int x, int y) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public boolean isKeyJustPressed(int key) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setCursorImage(Pixmap pixmap, int xHotspot, int yHotspot) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

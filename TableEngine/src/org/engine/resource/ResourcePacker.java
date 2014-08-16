@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.tools.imagepacker.TexturePacker2;
-import com.badlogic.gdx.tools.imagepacker.TexturePacker2.Settings;
+import com.badlogic.gdx.tools.texturepacker.TexturePacker;
+import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
 
 public class ResourcePacker {
 
@@ -152,7 +152,7 @@ public class ResourcePacker {
 				try {
 					s.maxWidth = 1024;
 					s.maxHeight = 1024;
-					TexturePacker2.process(images.getText(), assets.getText()
+					TexturePacker.process(images.getText(), assets.getText()
 							+ "/" + BasicResource.DESCRIPTION_ID, "pics");
 				} catch (Exception e2) {
 					output.append("\nERROR: " + e2.getMessage());
@@ -164,7 +164,7 @@ public class ResourcePacker {
 					for (String col : cols) {
 						for (String size : sizes) {
 							s.maxWidth = 256;
-							TexturePacker2.process(ui.getText() + "/" + col
+							TexturePacker.process(ui.getText() + "/" + col
 									+ "/drawable-" + size, assets.getText()
 									+ "/" + BasicResource.DESCRIPTION_ID, "ui-"
 									+ col + "-" + size);

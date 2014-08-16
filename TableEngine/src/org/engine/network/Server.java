@@ -247,6 +247,12 @@ public class Server {
 					listener.error(e, action);
 				}
 			}
+
+			@Override
+			public void cancelled() {
+				// TODO Auto-generated method stub
+				
+			}
 		});
 	}
 

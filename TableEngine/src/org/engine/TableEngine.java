@@ -152,7 +152,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	private PlayerArrayProperty playerList = new PlayerArrayProperty("PLAYERS",
 			TABLE_ENGINE_TAG, Flag.NONE, new Array<Player>(PLAYER_LIMIT,
 					PLAYER_LIMIT));
-	private Property[] rigidProperties = new Property[] { objID, animationList,
+	private Property<?>[] rigidProperties = new Property[] { objID, animationList,
 			banList, chatList, playerList };
 	Array<Property<?>> propertyArray = new Array<Property<?>>(rigidProperties);
 	Array<Property<?>> flaggedPropertyArray = new Array<Property<?>>();
@@ -330,7 +330,12 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 				}
 
 				// Apply other stuff from definitions class
-				setFullScreen(def.isFullScreen());
+				if (def.isFullScreen()) {
+
+					setFullScreen(true);
+					resize(Gdx.graphics.getDesktopDisplayMode().width,
+							Gdx.graphics.getDesktopDisplayMode().height);
+				}
 				settingsScreen = def.getSettingsStage();
 				// Finally set style again for all the added Skinnable classes.
 				setStyle(s, sn);
@@ -338,7 +343,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 
 				Gdx.app.error("EXCEPTION CAUGHT DURING LOADING: ",
 						e.getMessage()
-								+ "\ni haven't a clue what i am doing... you"
+								+ "\ni have no clue what i am doing... you"
 								+ "'re screwed, so utterly utterly screwed.");
 				e.printStackTrace();
 			}
@@ -417,8 +422,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	 */
 	protected TableEngineDefinition loadGame() {
 
-		return TableEngineDefinition.DefaultTableEngineDefinition
-				.getStandardDef();
+		return null;
 	}
 
 	/*
@@ -454,6 +458,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 			g.setColor(Color.valueOf(getPrefString("bgColor")));
 			g.fillRect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			output(g);
+			
 		} else {
 			Gdx.gl.glClearColor(0F, 0F, 0F, 1F);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -569,7 +574,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	public void resize(final int width, final int height) {
 		camera.setToOrtho(false, width, height);
 		g.setProjectionMatrix(camera.combined);
-		ui.setViewport(width, height, false);
+		ui.getViewport().setWorldSize(width, height);
 		for (Layer l : layerList) {
 			for (Interactable i : l.a) {
 				if (Skinnable.class.isAssignableFrom(i.getClass())) {
@@ -630,8 +635,8 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 			// SET TO USER INTERFACE STAGE VIEW
 			Gdx.input.setInputProcessor(getUI());
 			Gdx.graphics.setContinuousRendering(true);
-			getUI().setViewport(Gdx.graphics.getWidth(),
-					Gdx.graphics.getHeight(), false);
+			getUI().getViewport().setWorldSize(Gdx.graphics.getWidth(),
+					Gdx.graphics.getHeight());
 		}
 		this.showUI = showUI;
 
@@ -653,7 +658,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 					max = d;
 				}
 			}
-			Gdx.graphics.setDisplayMode(max.width, max.height, fullScreen);
+			Gdx.graphics.setDisplayMode(max);
 		}
 	}
 
@@ -879,28 +884,41 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 	}
 
 	/**
-	 * The main method.
+	 * A main method for testing purposes. W
 	 * 
 	 * @param args
-	 *            the arguments
+	 *            title width height debug
 	 */
 	public static void main(String[] args) {
 
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "TableEngine";
-		cfg.useGL20 = true;
 		cfg.width = 480;
 		cfg.height = 320;
 
-		TableEngine t = new TableEngine();
-		new LwjglApplication(t, cfg);
-//		if (args.length > 0 && args[0] != null) {
-//			if (args[0].equals("debug")) {
-//				new DebugWindow(t).open();
-//			}
-//		}
-		new DebugWindow(t).open();
+		TableEngine t = new TableEngine() {
 
+			@Override
+			protected TableEngineDefinition loadGame() {
+
+				return TableEngineDefinition.DefaultTableEngineDefinition
+						.getStandardDef();
+			}
+		};
+
+		if (args.length > 2) {
+			cfg.title = args[0];
+			cfg.width = Integer.parseInt(args[1]);
+			cfg.height = Integer.parseInt(args[2]);
+
+			if (Boolean.parseBoolean(args[3])) {
+
+				DebugWindow d = new DebugWindow(t);
+				d.open();
+			}
+		}
+
+		new LwjglApplication(t, cfg);
 	}
 
 	/**
@@ -1169,7 +1187,7 @@ public class TableEngine implements ApplicationListener, Synchronizable,
 
 		final TableEngine t = this;
 		if (waitingForSend == 0) {
-			
+
 			waitingForSend++;
 			new Thread() {
 

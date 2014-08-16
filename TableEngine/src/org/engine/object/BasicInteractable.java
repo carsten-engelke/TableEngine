@@ -20,7 +20,6 @@ import org.engine.property.IntegerProperty;
 import org.engine.property.Property.Flag;
 import org.engine.resource.BasicResource;
 import org.engine.utils.Array;
-import org.engine.utils.MathUtils;
 import org.engine.utils.SortableInteractableArray;
 
 import com.badlogic.gdx.Gdx;
@@ -32,8 +31,8 @@ import com.badlogic.gdx.utils.TimeUtils;
  * The Superclass for all objects put into the TableEngine. You can specify
  * which interaction is applicable by overwriting the abilities of this class.
  */
-public class BasicInteractable extends Rectangle implements Interactable, Animateable,
-		PopupSlave, Skinnable {
+public class BasicInteractable extends Rectangle implements Interactable,
+		Animateable, PopupSlave, Skinnable {
 
 	/**
 	 * History: 1: old class import 2: set to rectangle and matrix
@@ -62,7 +61,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 	// SIZE AND POSITION
 	public final RectangleProperty metrics = new RectangleProperty("METRICS",
 			OBJECT_TAG, Flag.NONE, this);
-	public final FloatProperty z = new FloatProperty("Z", OBJECT_TAG, Flag.NONE, 0.0F);
+	public final FloatProperty z = new FloatProperty("Z", OBJECT_TAG,
+			Flag.NONE, 0.0F);
 	public final IntegerProperty shiftGrid = new IntegerProperty("SHIFT-GRID",
 			OBJECT_TAG, Flag.NONE, 1);
 	protected boolean shifting = false;
@@ -91,8 +91,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 	protected boolean rotating = false;
 
 	// SCALING
-	public final FloatProperty scale = new FloatProperty("SCALE", OBJECT_TAG, Flag.NONE,
-			1.0F);
+	public final FloatProperty scale = new FloatProperty("SCALE", OBJECT_TAG,
+			Flag.NONE, 1.0F);
 	public final FloatProperty scaleGrid = new FloatProperty("SCALE-GRID",
 			OBJECT_TAG, Flag.NONE, 0.25F);
 	protected boolean scaling = false;
@@ -140,8 +140,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		this.shiftGrid.set(shiftGrid);
 	}
 
-	public BasicInteractable(final Rectangle r, final int shiftGrid, final int angle,
-			final int rotateGrid) {
+	public BasicInteractable(final Rectangle r, final int shiftGrid,
+			final int angle, final int rotateGrid) {
 
 		this();
 		set(r);
@@ -219,7 +219,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		t = l.t;
 		style(t.uiSkin, t.uiStyleName);
 		adaptToScreenSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		i = new Information(t.getNewObjectID(getClass()), Layer.LAYER_TAG, Flag.NONE, "");
+		i = new Information(t.getNewObjectID(getClass()), Layer.LAYER_TAG,
+				Flag.NONE, "");
 	}
 
 	public boolean containsRelative(Vector2 v) {
@@ -569,7 +570,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 	@Override
 	public void receiveOrder(final String order) {
 
-		Gdx.app.error("Order",order);
+		Gdx.app.error("Order", order);
 		// t.setBlockIncomingNetworkTraffic(true);
 	}
 
@@ -615,7 +616,7 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		}
 		return ResizingPoint.NONE;
 	}
-	
+
 	private void startResizing(final InputEvent e) {
 
 		if ((mode == BasicInteractable.MODE_RESIZE) && (resizeGrid.get() > 0)
@@ -683,7 +684,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 	protected void stopResizing() {
 
-		if (resizing && abilities.contains(BasicInteractable.MODE_RESIZE, false)) {
+		if (resizing
+				&& abilities.contains(BasicInteractable.MODE_RESIZE, false)) {
 			float dx = (width % resizeGrid.get());
 			if (dx > (resizeGrid.get() / 2)) {
 				dx = -(resizeGrid.get() - dx);
@@ -819,10 +821,11 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 
 		updateTransform(this, angle.get(), scale.get());
 	}
-	
+
 	protected void updateTransformWithoutPosition() {
 
-		updateTransform(new Rectangle(0, 0, width, height), angle.get(), scale.get());
+		updateTransform(new Rectangle(0, 0, width, height), angle.get(),
+				scale.get());
 	}
 
 	protected void updateTransform(Rectangle r, int angle, float scale) {
@@ -846,43 +849,60 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			float dX = (lastRelativeInputPosition.x - relativePosition.x);
 			float dY = (lastRelativeInputPosition.y - relativePosition.y);
 			if (resizeArea == ResizingPoint.LowerLeft) {
-				resizeOldOppositePosition.set(transformRelativePointToPoint(width, height));
+				resizeOldOppositePosition.set(transformRelativePointToPoint(
+						width, height));
 				setSize(width + dX, height + dY);
 				updateTransform();
-				resizeNewOppositePosition.set(transformRelativePointToPoint(width, height));
-				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
-				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				resizeNewOppositePosition.set(transformRelativePointToPoint(
+						width, height));
+				float dsX = resizeNewOppositePosition.x
+						- resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y
+						- resizeOldOppositePosition.y;
 				setPosition(x - dsX, y - dsY);
 			}
 			if (resizeArea == ResizingPoint.LowerRight) {
-				resizeOldOppositePosition.set(transformRelativePointToPoint(0, height));
+				resizeOldOppositePosition.set(transformRelativePointToPoint(0,
+						height));
 				setSize(width - dX, height + dY);
 				updateTransform();
-				resizeNewOppositePosition.set(transformRelativePointToPoint(0, height));
-				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
-				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				resizeNewOppositePosition.set(transformRelativePointToPoint(0,
+						height));
+				float dsX = resizeNewOppositePosition.x
+						- resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y
+						- resizeOldOppositePosition.y;
 				setPosition(x - dsX, y - dsY);
 			}
 			if (resizeArea == ResizingPoint.UpperLeft) {
-				resizeOldOppositePosition.set(transformRelativePointToPoint(width, 0));
+				resizeOldOppositePosition.set(transformRelativePointToPoint(
+						width, 0));
 				setSize(width + dX, height - dY);
 				updateTransform();
-				resizeNewOppositePosition.set(transformRelativePointToPoint(width, 0));
-				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
-				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				resizeNewOppositePosition.set(transformRelativePointToPoint(
+						width, 0));
+				float dsX = resizeNewOppositePosition.x
+						- resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y
+						- resizeOldOppositePosition.y;
 				setPosition(x - dsX, y - dsY);
 			}
 			if (resizeArea == ResizingPoint.UpperRight) {
-				resizeOldOppositePosition.set(transformRelativePointToPoint(0, 0));
+				resizeOldOppositePosition.set(transformRelativePointToPoint(0,
+						0));
 				setSize(width - dX, height - dY);
 				updateTransform();
-				resizeNewOppositePosition.set(transformRelativePointToPoint(0, 0));
-				float dsX = resizeNewOppositePosition.x - resizeOldOppositePosition.x;
-				float dsY = resizeNewOppositePosition.y - resizeOldOppositePosition.y;
+				resizeNewOppositePosition.set(transformRelativePointToPoint(0,
+						0));
+				float dsX = resizeNewOppositePosition.x
+						- resizeOldOppositePosition.x;
+				float dsY = resizeNewOppositePosition.y
+						- resizeOldOppositePosition.y;
 				setPosition(x - dsX, y - dsY);
 			}
 			updateTransform();
-			relativePosition.set(transformPointToRelativePoint(e.getPosition()));
+			relativePosition
+					.set(transformPointToRelativePoint(e.getPosition()));
 			Gdx.graphics.requestRendering();
 		}
 	}
@@ -1001,9 +1021,10 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			fps = 60;
 		}
 
-		ResizeAnimationThread(final BasicInteractable parent, final Vector2 start,
-				final Vector2 end, final int toStartFrames,
-				final float animationSeconds, final int fps) {
+		ResizeAnimationThread(final BasicInteractable parent,
+				final Vector2 start, final Vector2 end,
+				final int toStartFrames, final float animationSeconds,
+				final int fps) {
 
 			this.parent = parent;
 			this.start = start;
@@ -1126,8 +1147,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 				// MOVE TO START
 				while (time - starttime < toStartSeconds * 1000) {
 					float d = (time - starttime) / (toStartSeconds * 1000);
-					parent.angle.set(MathUtils.ceil(initialAng
-							- (initialAng - start) * d));
+					parent.angle.set(com.badlogic.gdx.math.MathUtils
+							.ceil(initialAng - (initialAng - start) * d));
 					Gdx.graphics.requestRendering();
 					final long sleep = TimeUtils.millis() - time;
 					if (sleep < (1000 / fps)) {
@@ -1151,7 +1172,8 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 				// MOVE FROM START TO END
 				while (time - starttime < animationSeconds * 1000) {
 					float d = (time - starttime) / (animationSeconds * 1000);
-					parent.angle.set(MathUtils.ceil(start - (start - end) * d));
+					parent.angle.set(com.badlogic.gdx.math.MathUtils.ceil(start
+							- (start - end) * d));
 					Gdx.graphics.requestRendering();
 					final long sleep = TimeUtils.millis() - time;
 					if (sleep < (1000 / fps)) {
@@ -1198,9 +1220,10 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 			fps = 60;
 		}
 
-		ShiftAnimationThread(final BasicInteractable parent, final Vector2 start,
-				final Vector2 end, final float toStartSeconds,
-				final float animationSeconds, final int fps) {
+		ShiftAnimationThread(final BasicInteractable parent,
+				final Vector2 start, final Vector2 end,
+				final float toStartSeconds, final float animationSeconds,
+				final int fps) {
 
 			this.parent = parent;
 			this.start = start;
@@ -1274,7 +1297,6 @@ public class BasicInteractable extends Rectangle implements Interactable, Animat
 		}
 	}
 
-	
 	@Override
 	public boolean isColliding(Vector2 point) {
 

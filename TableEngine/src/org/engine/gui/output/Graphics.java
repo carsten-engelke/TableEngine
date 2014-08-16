@@ -12,42 +12,68 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
+//public enum DrawMode DRAWMODE_NONE, DRAWMODE_SPRITE, DRAWMODE_SHAPE;
+
 class DrawMode {
 
-	public static final short IMAGE_MODE = 1;
-	public static final short NO_DRAWING = 0;
+	enum Type {
+		DRAW_NONE, DRAW_SPRITEBATCH, DRAW_SHAPE_LINE, DRAW_SHAPE_FILLED, DRAW_SHAPE_POINT
+	};
 
-	public static final short SHAPE_MODE = 2;
-	private final short mode;
-	private final ShapeType shape;
+	private Type t;
 
-	public DrawMode(final short type, final ShapeType shape) {
+	public DrawMode(Type type) {
 
-		mode = type;
-		this.shape = shape;
+		t = type;
 	}
 
-	public short getMode() {
-		return mode;
+	public Type getType() {
+		return t;
 	}
 
 	public ShapeType getShape() {
-		return shape;
+
+		if (t == Type.DRAW_SHAPE_FILLED) {
+
+			return ShapeType.Filled;
+		}
+		if (t == Type.DRAW_SHAPE_LINE) {
+
+			return ShapeType.Line;
+		}
+		if (t == Type.DRAW_SHAPE_POINT) {
+
+			return ShapeType.Point;
+		}
+		return null;
 	}
 
 	@Override
 	public String toString() {
-		return mode + " - " + shape;
+		return super.toString() + "[" + t  + "]";
 	}
 }
 
 public class Graphics {
 
-	private Color color = Color.WHITE;
-	private BitmapFont font = new BitmapFont();
+	public static final Color COLOR_RESET = Color.WHITE;
+	private Color color = COLOR_RESET;
+	public static final BitmapFont FONT_RESET = new BitmapFont();
+	private BitmapFont font = FONT_RESET;
+
+	public static final DrawMode DRAW_NONE = new DrawMode(
+			DrawMode.Type.DRAW_NONE);
+	public static final DrawMode DRAW_SPRITEBATCH = new DrawMode(
+			DrawMode.Type.DRAW_SPRITEBATCH);
+	public static final DrawMode DRAW_SHAPE_LINE = new DrawMode(
+			DrawMode.Type.DRAW_SHAPE_LINE);
+	public static final DrawMode DRAW_SHAPE_FILLED = new DrawMode(
+			DrawMode.Type.DRAW_SHAPE_FILLED);
+	public static final DrawMode DRAW_SHAPE_POINT = new DrawMode(
+			DrawMode.Type.DRAW_SHAPE_POINT);
 
 	private float lineWidth = 1;
-	private DrawMode mode = new DrawMode(DrawMode.NO_DRAWING, null);
+	private DrawMode mode = DRAW_NONE;
 	private final ShapeRenderer shape;
 	private final SpriteBatch sprite;
 
@@ -76,7 +102,7 @@ public class Graphics {
 
 	public void drawCircle(final float x, final float y, final float radius) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Line));
+		switchMode(DRAW_SHAPE_LINE);
 
 		shape.circle(x, y, radius);
 
@@ -86,7 +112,7 @@ public class Graphics {
 			final float cy1, final float cx2, final float cy2, final float x2,
 			final float y2, final int segments) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Line));
+		switchMode(DRAW_SHAPE_LINE);
 
 		shape.curve(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments);
 
@@ -127,13 +153,13 @@ public class Graphics {
 	public void drawRect(final float x, final float y, final float width,
 			final float height) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Line));
+		switchMode(DRAW_SHAPE_LINE);
 
 		shape.rect(x, y, width, height);
 
 		if (lineWidth > 1) {
 
-			switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Filled));
+			switchMode(DRAW_SHAPE_FILLED);
 
 			shape.rect(x - (lineWidth / 2), y - (lineWidth / 2), lineWidth,
 					lineWidth);
@@ -148,7 +174,7 @@ public class Graphics {
 
 	public TextBounds drawString(final String str, final float x, float y) {
 
-		switchMode(new DrawMode(DrawMode.IMAGE_MODE, null));
+		switchMode(DRAW_SPRITEBATCH);
 
 		y += font.getDescent() + font.getLineHeight() + 3;
 
@@ -162,7 +188,7 @@ public class Graphics {
 	public TextBounds drawStringWrapped(final String str, final float x,
 			float y, final float width, final HAlignment alignment) {
 
-		switchMode(new DrawMode(DrawMode.IMAGE_MODE, null));
+		switchMode(DRAW_SPRITEBATCH);
 		y = y + font.getDescent();
 		return font.drawWrapped(sprite, str, x, y, width, alignment);
 	}
@@ -170,7 +196,7 @@ public class Graphics {
 	public void drawTriangle(final float x1, final float y1, final float x2,
 			final float y2, final float x3, final float y3) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Line));
+		switchMode(DRAW_SHAPE_LINE);
 
 		shape.triangle(x1, y1, x2, y2, x3, y3);
 
@@ -179,19 +205,19 @@ public class Graphics {
 	public void drawUI(final Drawable d, final float x, final float y,
 			final float width, final float height) {
 
-		switchMode(new DrawMode(DrawMode.IMAGE_MODE, null));
+		switchMode(DRAW_SPRITEBATCH);
 
 		d.draw(sprite, x, y, width, height);
 	}
 
 	public void endDrawing() {
 
-		switchMode(new DrawMode(DrawMode.NO_DRAWING, null));
+		switchMode(DRAW_NONE);
 	}
 
 	public void fillCircle(final float x, final float y, final float radius) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Filled));
+		switchMode(DRAW_SHAPE_FILLED);
 
 		shape.circle(x, y, radius);
 
@@ -202,7 +228,7 @@ public class Graphics {
 	public void fillRect(final float x, final float y, final float width,
 			final float height) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Filled));
+		switchMode(DRAW_SHAPE_FILLED);
 
 		shape.rect(x, y, width, height);
 
@@ -212,7 +238,7 @@ public class Graphics {
 			final float height, final Color c1, final Color c2, final Color c3,
 			final Color c4) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Filled));
+		switchMode(DRAW_SHAPE_FILLED);
 
 		shape.rect(x, y, width, height, c1, c2, c3, c4);
 
@@ -221,7 +247,7 @@ public class Graphics {
 	public void fillTriangle(final float x1, final float y1, final float x2,
 			final float y2, final float x3, final float y3) {
 
-		switchMode(new DrawMode(DrawMode.SHAPE_MODE, ShapeType.Filled));
+		switchMode(DRAW_SHAPE_FILLED);
 
 		shape.triangle(x1, y1, x2, y2, x3, y3);
 
@@ -247,7 +273,7 @@ public class Graphics {
 			final float y, final float originX, final float originY,
 			final float width, final float height, final float scaleX,
 			final float scaleY, final float rotation) {
-		switchMode(new DrawMode(DrawMode.IMAGE_MODE, null));
+		switchMode(DRAW_SPRITEBATCH);
 		sprite.draw(region, x, y, originX, originY, width, height, scaleX,
 				scaleY, rotation);
 
@@ -256,8 +282,8 @@ public class Graphics {
 	public void reset() {
 
 		setLineWidth(1);
-		setColor(Color.WHITE);
-		setFont(new BitmapFont());
+		setColor(COLOR_RESET);
+		setFont(FONT_RESET);
 	}
 
 	public void setColor(final Color color) {
@@ -291,14 +317,16 @@ public class Graphics {
 	private void switchMode(final DrawMode mode) {
 
 		// if this is to be switched to no-drawing mode
-		if ((mode.getMode() == DrawMode.NO_DRAWING)
-				&& (this.mode.getMode() != DrawMode.NO_DRAWING)) {
-
-			if (this.mode.getMode() == DrawMode.IMAGE_MODE) {
+		if ((mode.getType() == DrawMode.Type.DRAW_NONE)
+				&& (this.mode.getType() != DrawMode.Type.DRAW_NONE)) {
+			
+			if (this.mode.getType() == DrawMode.Type.DRAW_SPRITEBATCH) {
 
 				sprite.end();
 			}
-			if (this.mode.getMode() == DrawMode.SHAPE_MODE) {
+			if (this.mode.getType() == DrawMode.Type.DRAW_SHAPE_LINE || 
+					this.mode.getType() == DrawMode.Type.DRAW_SHAPE_FILLED || 
+					this.mode.getType() == DrawMode.Type.DRAW_SHAPE_POINT) {
 
 				shape.end();
 			}
@@ -307,12 +335,14 @@ public class Graphics {
 
 		// if this is to be switched to image mode and it has been without mode
 		// or in shape mode before
-		if ((mode.getMode() == DrawMode.IMAGE_MODE)
-				&& (this.mode.getMode() != DrawMode.IMAGE_MODE)) {
+		if ((mode.getType() == DrawMode.Type.DRAW_SPRITEBATCH)
+				&& (this.mode.getType() != DrawMode.Type.DRAW_SPRITEBATCH)) {
 
 			// switch to image mode
 
-			if (this.mode.getMode() == DrawMode.SHAPE_MODE) {
+			if (this.mode.getType() == DrawMode.Type.DRAW_SHAPE_LINE || 
+					this.mode.getType() == DrawMode.Type.DRAW_SHAPE_FILLED || 
+					this.mode.getType() == DrawMode.Type.DRAW_SHAPE_POINT) {
 
 				shape.end();
 			}
@@ -322,14 +352,18 @@ public class Graphics {
 		}
 		// if this is to be switched to shape mode and it has been without mode
 		// or in image mode or in different shape mode
-		if (mode.getMode() == DrawMode.SHAPE_MODE) {
+		if (mode.getType() == DrawMode.Type.DRAW_SHAPE_LINE || 
+				mode.getType() == DrawMode.Type.DRAW_SHAPE_FILLED || 
+				mode.getType() == DrawMode.Type.DRAW_SHAPE_POINT) {
 
 			// switch to shape mode
-			if (this.mode.getMode() == DrawMode.IMAGE_MODE) {
+			if (this.mode.getType() == DrawMode.Type.DRAW_SPRITEBATCH) {
 
 				sprite.end();
 			}
-			if (this.mode.getMode() == DrawMode.SHAPE_MODE) {
+			if (this.mode.getType() == DrawMode.Type.DRAW_SHAPE_LINE || 
+					this.mode.getType() == DrawMode.Type.DRAW_SHAPE_FILLED || 
+					this.mode.getType() == DrawMode.Type.DRAW_SHAPE_POINT) {
 
 				if (!this.mode.getShape().equals(mode.getShape())) {
 
@@ -344,5 +378,4 @@ public class Graphics {
 			}
 		}
 	}
-
 }

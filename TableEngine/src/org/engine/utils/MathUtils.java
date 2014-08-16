@@ -1,6 +1,6 @@
 package org.engine.utils;
 
-public class MathUtils extends com.badlogic.gdx.math.MathUtils{
+public class MathUtils {
 	
 	public static float max(float a, float b) {
 		if (a > b) {

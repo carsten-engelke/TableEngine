@@ -5,9 +5,14 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="lib" path="libs/gdx.jar" sourcepath="libs/gdx-sources.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-tools.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.eclipse.swt"/>
-	<classpathentry kind="lib" path="C:/Users/Carsten/Eigene Programme/libgdx/gdx-backend-lwjgl.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Carsten/Eigene Programme/libgdx/gdx-backend-lwjgl-natives.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Carsten/Eigene Programme/libgdx/gdx-natives.jar"/>
+	<classpathentry kind="lib" path="/java-libraries/swt-4.3.2-win32-win32-x86/swt.jar" sourcepath="/java-libraries/swt-4.3.2-win32-win32-x86/src.zip"/>
+	<classpathentry kind="lib" path="/java-libraries/commons-io-2.4/commons-io-2.4.jar" sourcepath="/java-libraries/commons-io-2.4/commons-io-2.4-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/java-libraries/commons-io-2.4/commons-io-2.4-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl.jar" sourcepath="libs/gdx-backend-lwjgl-sources.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-natives.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-natives.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

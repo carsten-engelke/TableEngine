@@ -27,8 +27,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.tools.imagepacker.TexturePacker2;
-import com.badlogic.gdx.tools.imagepacker.TexturePacker2.Settings;
+import com.badlogic.gdx.tools.texturepacker.TexturePacker;
+import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
 
 public class BasicResource implements Resource {
 
@@ -69,7 +69,7 @@ public class BasicResource implements Resource {
 		final Settings s = new Settings();
 		// s.maxWidth = 1024;
 		s.maxHeight = 1024;
-		TexturePacker2.process(
+		TexturePacker.process(
 				"C:/Users/Carsten/EngineWorkspace/TableEngine/images",
 				"C:/Users/Carsten/EngineWorkspace/TableEngine/assets/"
 						+ BasicResource.DESCRIPTION_ID, "pics");
@@ -135,7 +135,7 @@ public class BasicResource implements Resource {
 
 	private static void packSkin(Settings s, String col, String size) throws IOException {
 		
-		TexturePacker2.process(s,
+		TexturePacker.process(s,
 				"C:/Users/Carsten/EngineWorkspace/TableEngine/ui/" + col
 						+ "/drawable-" + size,
 				"C:/Users/Carsten/EngineWorkspace/TableEngine/assets/"
